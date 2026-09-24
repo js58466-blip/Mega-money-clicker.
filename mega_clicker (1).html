@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mega Clicker: Color Coins</title>
+<style>
+body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#111827,#312e81);color:white;text-align:center;margin:0;padding:20px}
+h1{margin:8px 0}.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.card{background:#ffffff18;border:1px solid #ffffff25;border-radius:14px;padding:10px 16px}
+#coin{width:150px;height:150px;border-radius:50%;margin:25px auto 10px;display:flex;align-items:center;justify-content:center;font-size:58px;background:linear-gradient(145deg,#ffe066,#d99a00);border:8px solid #fff1a8;box-shadow:0 8px 25px #0008;cursor:pointer;user-select:none;transition:.12s}
+#coin:active{transform:scale(.88)}
+.bronze{background:linear-gradient(145deg,#d99555,#8a4f20)!important}
+.silver{background:linear-gradient(145deg,#f4f4f4,#777)!important}
+.gold{background:linear-gradient(145deg,#fff06a,#e09b00)!important}
+.space{background:linear-gradient(145deg,#62d9ff,#3156ff)!important;box-shadow:0 0 35px #43c7ff!important}
+.cosmic{background:linear-gradient(145deg,#ff69f7,#722cff)!important;box-shadow:0 0 45px #d64cff!important}
+button{background:#4f46e5;color:white;border:0;border-radius:10px;padding:10px 14px;margin:4px;cursor:pointer;font-weight:bold}
+button:hover{filter:brightness(1.15)}
+.shop,.ach{max-width:900px;margin:20px auto;background:#ffffff10;padding:15px;border-radius:16px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#0003;margin:7px 0;padding:10px;border-radius:10px;text-align:left}
+#message{height:28px;font-weight:bold}.locked{opacity:.5}
+</style>
+</head>
+<body>
+<h1>🪙 MEGA CLICKER</h1>
+<div class="stats">
+<div class="card">🪙 Coins: <b id="coins">0</b></div>
+<div class="card">💎 Gems: <b id="gems">0</b></div>
+<div class="card">🔮 Crystals: <b id="crystals">0</b></div>
+<div class="card">🌌 Stars: <b id="stars">0</b></div>
+<div class="card">⭐ Level: <b id="level">1</b></div>
+</div>
+<p>XP: <b id="xp">0</b> / <b id="nextxp">100</b></p>
+<div id="coin">🪙</div>
+<div id="message">Click the coin!</div>
+<p>Power: <b id="power">1</b> | CPS: <b id="cps">0</b> | Gems/s: <b id="gps">0</b> | Crystals/s: <b id="crystalps">0</b> | Stars/s: <b id="starps">0</b></p>
+
+<div class="shop"><h2>🛒 Upgrade Shop</h2><div id="shop"></div></div>
+<div class="ach"><h2>🏆 Achievements</h2><div id="achievements"></div><button onclick="resetGame()">Reset Game</button></div>
+
+<script>
+let s={coins:0,gems:0,crystals:0,stars:0,power:1,cps:0,gps:0,crystalps:0,starps:0,total:0,xp:0,level:1};
+const upgrades=[
+['💪','Stronger Finger','coins',25,'power',1],['🤖','Coin Bot','coins',75,'cps',1],
+['🔥','Golden Finger','coins',500,'power',5],['🏭','Coin Factory','coins',2500,'cps',10],
+['⚡','Turbo Factory','coins',10000,'cps',50],['👆','Double Tap','coins',50000,'powermult',2],
+['💎','Gem Generator','gems',10,'gps',1],['💎','Gem Booster','gems',50,'power',25],
+['💎','Gem Factory','gems',250,'gps',10],['💠','Gem Multiplier','gems',1000,'powermult',2],
+['💎','Diamond Engine','gems',5000,'gps',100],['🔮','Crystal Mine','gems',250,'crystalps',1],
+['🔮','Crystal Drill','gems',1000,'crystalps',5],['🔮','Crystal Reactor','gems',5000,'power',250],
+['🔮','Crystal Multiplier','gems',25000,'powermult',3],['🌌','Star Engine','crystals',25,'starps',1],
+['🌌','Star Forge','crystals',150,'starps',5],['🌠','Galaxy Core','crystals',1000,'power',2500],
+['🌠','Universe Engine','crystals',10000,'starps',100],['👑','Reality Breaker','stars',100,'powermult',10],
+['♾️','Infinite Tap','stars',1000,'powermult',25]
+];
+let costs=upgrades.map(x=>x[3]);
+const ach=[
+['🥇 First Click',()=>s.total>=1],['🔥 100 Clicks',()=>s.total>=100],['💰 10K Coins',()=>s.coins>=1e4],
+['💰 1M Coins',()=>s.coins>=1e6],['💎 100 Gems',()=>s.gems>=100],['🔮 100 Crystals',()=>s.crystals>=100],
+['🌌 100 Stars',()=>s.stars>=100],['⬆️ Level 10',()=>s.level>=10],['🚀 Level 25',()=>s.level>=25],
+['🌠 Level 50',()=>s.level>=50],['🥉 Bronze Click',()=>false],['🥈 Silver Click',()=>false],
+['🥇 Gold Click',()=>false],['🚀 Space Click',()=>false],['🌌 Cosmic Click',()=>false]
+];
+let gotRare={bronze:false,silver:false,gold:false,space:false,cosmic:false};
+
+function addXP(n){s.xp+=n;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++;}}
+function rare(){
+ let r=Math.random();
+ if(r<.002&&s.level>=30){gotRare.cosmic=true;return['cosmic','🌌 COSMIC CLICK!!!',1000]}
+ if(r<.01&&s.level>=20){gotRare.space=true;return['space','🚀 SPACE CLICK!',50]}
+ if(r<.04&&s.level>=10){gotRare.gold=true;return['gold','🥇 GOLD CLICK!',15]}
+ if(r<.10&&s.level>=5){gotRare.silver=true;return['silver','🥈 SILVER CLICK!',5]}
+ if(r<.22){gotRare.bronze=true;return['bronze','🥉 BRONZE CLICK!',2]}
+ return['normal','Normal Click',1]
+}
+document.getElementById('coin').onclick=()=>{
+ let [cl,msg,m]=rare();s.coins+=s.power*m;s.total++;addXP(Math.max(1,Math.floor(s.power/2)));
+ let c=document.getElementById('coin');c.className=cl;c.textContent=cl==='cosmic'?'🌌':cl==='space'?'🚀':'🪙';
+ document.getElementById('message').textContent=msg+' x'+m;
+ render();
+};
+function buy(i){
+ let u=upgrades[i],cur=u[2],cost=costs[i];if(s[cur]<cost)return;
+ s[cur]-=cost;let stat=u[4],v=u[5];
+ if(stat==='powermult')s.power*=v;else s[stat]+=v;
+ costs[i]=Math.ceil(cost*1.72);render();
+}
+function render(){
+ for(let k of ['coins','gems','crystals','stars','power','cps','gps','crystalps','starps','level','xp'])document.getElementById(k).textContent=Math.floor(s[k]);
+ document.getElementById('nextxp').textContent=s.level*100;
+ document.getElementById('shop').innerHTML=upgrades.map((u,i)=>`<div class="item"><span>${u[0]} <b>${u[1]}</b><br>Cost: ${u[3]?costs[i].toLocaleString():0} ${u[2]}</span><button onclick="buy(${i})">BUY</button></div>`).join('');
+ document.getElementById('achievements').innerHTML=ach.map((a,i)=>{
+ let done=i<10?a[1]():Object.values(gotRare)[i-10];
+ return `<div class="${done?'':'locked'}">${done?'🏆':'🔒'} ${a[0]}</div>`}).join('');
+}
+function resetGame(){if(confirm('Reset your game?'))location.reload()}
+setInterval(()=>{s.coins+=s.cps;s.gems+=s.gps;if(s.level>=15)s.crystals+=s.crystalps;if(s.level>=30)s.stars+=s.starps;addXP(Math.floor(s.cps/2));render()},1000);
+render();
+</script>
+</body>
+</html>
