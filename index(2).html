@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mega Clicker</title>
+<style>
+body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#111827,#312e81);color:#fff;text-align:center;padding:20px;margin:0}
+.top{display:flex;justify-content:center;gap:18px;flex-wrap:wrap}
+.stats,.section{background:#ffffff12;border:1px solid #ffffff25;border-radius:15px;padding:15px}
+.stats{text-align:left;min-width:210px}
+.statrow{display:flex;justify-content:space-between;margin:5px;gap:18px}
+.coin{width:150px;height:150px;border-radius:50%;margin:25px auto 10px;display:flex;align-items:center;justify-content:center;font-size:60px;background:linear-gradient(145deg,#ffe066,#d99a00);border:8px solid #fff1a8;box-shadow:0 8px 25px #0008;cursor:pointer;transition:.1s;user-select:none}
+.coin:active{transform:scale(.87)}
+.pop{animation:pop .28s}
+@keyframes pop{35%{transform:scale(1.18) rotate(-4deg)}70%{transform:scale(.94) rotate(4deg)}}
+.float{position:absolute;pointer-events:none;font-weight:bold;font-size:20px;animation:up .8s forwards}
+@keyframes up{to{opacity:0;transform:translateY(-75px) scale(1.2)}}
+.section{max-width:850px;margin:20px auto}
+.item{display:flex;justify-content:space-between;align-items:center;background:#0003;padding:10px;margin:7px;border-radius:10px;text-align:left;gap:10px}
+button{background:#4f46e5;color:#fff;border:0;border-radius:9px;padding:10px 13px;font-weight:bold;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.bad{background:#d62828!important;animation:shake .55s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.pets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.pet{background:#0003;border-radius:12px;padding:12px}
+.owned{outline:2px solid #60a5fa}
+.petIcon{font-size:42px}
+.pet button{width:100%;margin-top:8px}
+.muted{font-size:12px;opacity:.75}
+.msg{min-height:25px;font-weight:bold}
+.controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:12px auto}
+.save{font-size:12px;opacity:.75}
+.hotkeys{margin:10px auto;max-width:700px;background:#0003;padding:10px;border-radius:12px}
+</style>
+</head>
+<body>
+<h1>🪙 MEGA CLICKER</h1>
+
+<div class="controls">
+<button id="musicBtn">🎵 Music: OFF</button>
+<button id="soundBtn">🔊 Sounds: ON</button>
+<button id="resetBtn">♻️ Reset Game</button>
+</div>
+
+<div class="hotkeys">⌨️ Press <b>SPACE</b> or any <b>ARROW KEY</b> to tap!</div>
+
+<div class="top">
+<div>
+<div>Level <b id="level">1</b> • XP <b id="xp">0</b>/<b id="next">100</b></div>
+<div id="coin" class="coin">🪙</div>
+<div id="msg" class="msg">Click the coin!</div>
+<div>🪙 <b id="coins">0</b> 💎 <b id="gems">0</b> 🔮 <b id="crystals">0</b> 🌌 <b id="stars">0</b></div>
+<div class="muted">Power <b id="power">1</b> • CPS <b id="cps">0</b></div>
+<div class="save" id="saveStatus">💾 Auto-save ready</div>
+</div>
+
+<div class="stats">
+<h3>📊 Click Stats</h3>
+<div class="statrow">Total clicks <b id="clicks">0</b></div>
+<div class="statrow">Normal <b id="normal">0</b></div>
+<div class="statrow">🥉 Bronze <b id="bronze">0</b></div>
+<div class="statrow">🥈 Silver <b id="silver">0</b></div>
+<div class="statrow">🥇 Gold <b id="gold">0</b></div>
+<div class="statrow">🚀 Space <b id="space">0</b></div>
+<div class="statrow">🌌 Cosmic <b id="cosmic">0</b></div>
+</div>
+</div>
+
+<div class="section"><h2>🛒 Upgrades</h2><div id="shop"></div></div>
+<div class="section"><h2>🐾 Pets</h2><div class="muted">Pets boost your clicks.</div><div id="pets" class="pets"></div></div>
+
+<script>
+const defaultState={
+coins:0,gems:0,crystals:0,stars:0,power:1,cps:0,gps:0,crystalps:0,starps:0,
+xp:0,level:1,clicks:0,normal:0,bronze:0,silver:0,gold:0,space:0,cosmic:0,pet:1,
+ownedPets:[],upgradeCounts:[]
+};
+
+let s=loadGame();
+
+const U=[
+["💪 Stronger Finger","coins",25,"power",1],
+["🤖 Coin Bot","coins",75,"cps",1],
+["🔥 Golden Finger","coins",500,"power",5],
+["🏭 Coin Factory","coins",2500,"cps",10],
+["⚡ Turbo Factory","coins",10000,"cps",50],
+["👆 Double Tap","coins",50000,"mul",2],
+["🧲 Mega Magnet","coins",250000,"power",50],
+["🏗️ Super Factory","coins",1000000,"cps",250],
+["🚀 Rocket Clicker","coins",5000000,"power",500],
+["🌟 Golden Machine","coins",25000000,"cps",2000],
+["💎 Gem Generator","gems",10,"gps",1],
+["💎 Gem Booster","gems",50,"power",25],
+["💎 Gem Factory","gems",250,"gps",10],
+["💠 Gem Multiplier","gems",1000,"mul",2],
+["💎 Diamond Engine","gems",5000,"gps",100],
+["💎 Gem Reactor","gems",25000,"power",1000],
+["🔮 Crystal Mine","gems",250,"crystalps",1],
+["🔮 Crystal Drill","gems",1000,"crystalps",5],
+["🔮 Crystal Reactor","gems",5000,"power",250],
+["🔮 Crystal Multiplier","gems",25000,"mul",3],
+["🔮 Crystal Factory","gems",100000,"crystalps",100],
+["🌌 Star Engine","crystals",25,"starps",1],
+["🌌 Star Forge","crystals",150,"starps",5],
+["🌠 Galaxy Core","crystals",1000,"power",2500],
+["🌠 Universe Engine","crystals",10000,"starps",100],
+["🌌 Star Booster","crystals",50000,"power",25000],
+["👑 Reality Breaker","stars",100,"mul",10],
+["♾️ Infinite Tap","stars",1000,"mul",25],
+["🌠 Multiverse Machine","stars",10000,"cps",100000],
+["🪐 Omniverse Core","stars",100000,"power",1000000]
+];
+
+let costs=U.map((u,i)=>Math.max(u[2],Math.floor(u[2]*Math.pow(1.72,s.upgradeCounts[i]||0))));
+
+const P=[
+["🐶","Coin Pup",1000,1.25],
+["🐱","Gem Cat",5000,1.5],
+["🐲","Dragon",50000,2],
+["🦄","Cosmic Unicorn",500000,4],
+["🐉","Galaxy Dragon",5000000,8]
+];
+
+function loadGame(){
+try{
+const saved=JSON.parse(localStorage.getItem("megaClickerSave"));
+if(saved)return Object.assign({},defaultState,saved);
+}catch(e){}
+return JSON.parse(JSON.stringify(defaultState));
+}
+
+function saveGame(){
+try{
+localStorage.setItem("megaClickerSave",JSON.stringify(s));
+document.getElementById("saveStatus").textContent="💾 Progress saved!";
+setTimeout(()=>document.getElementById("saveStatus").textContent="💾 Auto-save on",900);
+}catch(e){document.getElementById("saveStatus").textContent="⚠️ Save unavailable in this browser";}
+}
+
+function f(n){return Math.floor(n).toLocaleString()}
+function addXP(n){
+s.xp+=n;
+while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++;}
+}
+
+function rare(){
+let r=Math.random();
+if(r<.002&&s.level>=30)return["cosmic",1000,"🌌 COSMIC CLICK!"];
+if(r<.01&&s.level>=20)return["space",50,"🚀 SPACE CLICK!"];
+if(r<.04&&s.level>=10)return["gold",15,"🥇 GOLD CLICK!"];
+if(r<.1&&s.level>=5)return["silver",5,"🥈 SILVER CLICK!"];
+if(r<.22)return["bronze",2,"🥉 BRONZE CLICK!"];
+return["normal",1,"Normal Click!"];
+}
+
+function bad(b,t){
+if(!b)return;
+b.classList.remove("bad");void b.offsetWidth;b.classList.add("bad");
+document.getElementById("msg").textContent="❌ "+t;
+setTimeout(()=>b.classList.remove("bad"),650);
+}
+
+function render(){
+["coins","gems","crystals","stars","power","cps","clicks","normal","bronze","silver","gold","space","cosmic","level","xp"]
+.forEach(k=>document.getElementById(k).textContent=f(s[k]));
+document.getElementById("next").textContent=f(s.level*100);
+
+document.getElementById("shop").innerHTML=U.map((u,i)=>{
+const count=s.upgradeCounts[i]||0;
+return `<div class="item">
+<span>${u[0]} <b>${u[1]}</b> <strong>×${count}</strong><br>
+<span class="muted">Next cost: ${f(costs[i])} ${u[2]}</span></span>
+<button data-u="${i}">BUY</button>
+</div>`;
+}).join("");
+
+document.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>buy(+b.dataset.u));
+
+document.getElementById("pets").innerHTML=P.map((p,i)=>{
+const owned=s.ownedPets.includes(i);
+return `<div class="pet ${owned?"owned":""}">
+<div class="petIcon">${p[0]}</div><b>${p[1]}</b>
+<div>🪙 ${f(p[2])}</div>
+<button data-p="${i}" ${owned?"disabled":""}>${owned?"OWNED":"GET PET"}</button>
+</div>`;
+}).join("");
+
+document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>pet(+b.dataset.p));
+}
+
+function buy(i){
+let u=U[i],b=document.querySelector(`[data-u="${i}"]`);
+if(s[u[1]]<costs[i])return bad(b,"Not enough "+u[1]+"!");
+s[u[1]]-=costs[i];
+u[3]==="mul"?s.power*=u[4]:s[u[3]]+=u[4];
+s.upgradeCounts[i]=(s.upgradeCounts[i]||0)+1;
+costs[i]=Math.ceil(costs[i]*1.72);
+playSound("buy");
+saveGame();
+render();
+}
+
+function pet(i){
+let p=P[i],b=document.querySelector(`[data-p="${i}"]`);
+if(s.ownedPets.includes(i))return;
+if(s.coins<p[2])return bad(b,"Not enough coins!");
+s.coins-=p[2];
+s.ownedPets.push(i);
+s.pet=Math.max(...s.ownedPets.map(x=>P[x][3]));
+playSound("buy");
+saveGame();
+render();
+}
+
+function tap(e){
+let [k,m,msg]=rare(),g=s.power*m*s.pet;
+s.coins+=g;s.clicks++;s[k]++;
+addXP(Math.max(1,Math.floor(g/2)));
+
+const c=document.getElementById("coin");
+c.classList.remove("pop");void c.offsetWidth;c.classList.add("pop");
+document.getElementById("msg").textContent=msg+" +"+f(g)+" 🪙";
+
+const q=document.createElement("span");
+q.className="float";q.textContent="+"+f(g);
+q.style.left=(e?.clientX||window.innerWidth/2)+"px";
+q.style.top=(e?.clientY||200)+"px";
+document.body.appendChild(q);setTimeout(()=>q.remove(),850);
+
+render();
+playSound(k==="cosmic"||k==="space"?"rare":"click");
+}
+
+document.getElementById("coin").addEventListener("click",tap);
+
+document.addEventListener("keydown",e=>{
+if(["INPUT","TEXTAREA","BUTTON"].includes(document.activeElement.tagName))return;
+if(e.code==="Space"||e.key.startsWith("Arrow")){
+e.preventDefault();tap();
+}
+});
+
+setInterval(()=>{
+s.coins+=s.cps*s.pet;
+if(s.level>=5)s.gems+=s.gps;
+if(s.level>=15)s.crystals+=s.crystalps;
+if(s.level>=30)s.stars+=s.starps;
+addXP(Math.floor(s.cps/2));
+render();
+},1000);
+
+setInterval(saveGame,5000);
+
+let audioCtx=null,musicOn=false,soundOn=true,musicTimer=null,step=0;
+
+function getAudio(){
+if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+if(audioCtx.state==="suspended")audioCtx.resume();
+return audioCtx;
+}
+
+function tone(freq,duration,type="sine",volume=.035){
+if(!soundOn)return;
+const a=getAudio(),o=a.createOscillator(),g=a.createGain();
+o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(volume,a.currentTime);
+g.gain.exponentialRampToValueAtTime(.001,a.currentTime+duration);
+o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+duration);
+}
+
+function playSound(kind){try{
+if(kind==="buy")tone(520,.12,"triangle",.05);
+else if(kind==="rare"){tone(700,.1,"sine",.05);setTimeout(()=>tone(1000,.16,"sine",.04),80);}
+else tone(330+Math.random()*100,.05,"square",.025);
+}catch(e){} }
+
+function musicLoop(){
+if(!musicOn)return;
+const notes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23];
+tone(notes[step%notes.length],.38,"sine",.012);
+step++;
+musicTimer=setTimeout(musicLoop,420);
+}
+
+document.getElementById("musicBtn").onclick=()=>{
+musicOn=!musicOn;
+document.getElementById("musicBtn").textContent="🎵 Music: "+(musicOn?"ON":"OFF");
+if(musicOn){getAudio();step=0;musicLoop();}
+else{clearTimeout(musicTimer);}
+};
+
+document.getElementById("soundBtn").onclick=()=>{
+soundOn=!soundOn;
+document.getElementById("soundBtn").textContent="🔊 Sounds: "+(soundOn?"ON":"OFF");
+if(soundOn){getAudio();tone(660,.1);}
+};
+
+document.getElementById("resetBtn").onclick=()=>{
+if(confirm("Reset ALL Mega Clicker progress?")){
+localStorage.removeItem("megaClickerSave");
+location.reload();
+}
+};
+
+render();
+
+</script>
+</body>
+</html>
