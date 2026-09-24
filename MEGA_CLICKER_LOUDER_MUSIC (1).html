@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mega Clicker</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#111827,#312e81);
+  color:#fff;
+  text-align:center;
+}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 20px 40px}
+.jax{
+  position:fixed;top:10px;left:12px;z-index:30;
+  font-size:12px;font-weight:800;letter-spacing:1.5px;
+  background:#4f46e5aa;color:#ffffffbb;padding:5px 8px;border-radius:7px;
+  box-shadow:0 3px 10px #0003;
+  opacity:.72;
+}
+.weatherBox{
+  max-width:650px;margin:7px auto 8px;
+  background:#ffffff10;border:1px solid #ffffff20;border-radius:11px;
+  padding:8px 12px;font-size:13px;
+}
+.weatherBox b{font-size:15px}
+.weatherRare{animation:weatherPulse 1.8s infinite alternate}
+@keyframes weatherPulse{to{box-shadow:0 0 22px #ffffff33}}
+.coinStage{position:relative;width:330px;height:270px;margin:0 auto}
+.coinWrap{position:absolute;left:80px;top:28px}
+.pointer{
+  position:absolute;left:50%;top:50%;transform-origin:0 0;
+  font-size:24px;pointer-events:none;
+  filter:drop-shadow(0 2px 3px #0008);
+  transition:.2s;
+}
+.pointerIcon{
+  display:block;background:#151b35dd;border:1px solid #ffffff22;
+  border-radius:50%;width:39px;height:39px;
+  line-height:37px;text-align:center;
+}
+.pointerLabel{
+  display:block;font-size:9px;white-space:nowrap;
+  margin-left:-8px;margin-top:2px;color:#fff9;
+}
+.pointerCount{
+  font-size:9px;background:#4f46e5;border-radius:8px;
+  padding:1px 4px;position:absolute;right:-7px;top:-4px;
+}
+.weatherParticle{
+  position:fixed;pointer-events:none;z-index:10;
+  animation:weatherFall linear forwards;
+}
+@keyframes weatherFall{
+  from{transform:translateY(-20px);opacity:0}
+  12%{opacity:.9}
+  to{transform:translateY(105vh);opacity:0}
+}
+h1{margin:0 0 16px;font-size:30px}
+.controls{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+button{
+  background:#4f46e5;color:#fff;border:0;border-radius:9px;
+  padding:9px 13px;font-weight:bold;cursor:pointer;
+}
+button:hover{filter:brightness(1.15)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.hotkeys{
+  max-width:650px;margin:8px auto 10px;
+  background:#0d1429;border-radius:12px;padding:10px;
+}
+.top{
+  display:grid;
+  grid-template-columns:1fr 220px;
+  gap:14px;
+  max-width:720px;
+  margin:0 auto 18px;
+  align-items:center;
+}
+.clickArea{padding:0 8px}
+.level{margin:2px 0 4px}
+.coin{
+  width:150px;height:150px;border-radius:50%;
+  margin:16px auto 9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:60px;
+  background:linear-gradient(145deg,#ffe066,#d99a00);
+  border:8px solid #fff1a8;
+  box-shadow:0 8px 25px #0008;
+  cursor:pointer;user-select:none;transition:.1s;
+}
+.coin:active{transform:scale(.87)}
+.coinWrap{position:relative;width:170px;height:178px;margin:0 auto}
+.coinWrap .coin{margin:16px auto 9px}
+.coinUpgrade{
+  position:absolute;left:50%;top:58px;
+  transform:translate(-50%,-50%) scale(.7);
+  font-size:30px;pointer-events:none;z-index:5;
+  opacity:0;animation:upgradePop 1.25s forwards;
+  text-shadow:0 3px 8px #000;
+}
+@keyframes upgradePop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.45)}
+  15%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}
+  45%{opacity:1;transform:translate(-50%,-70%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-130%) scale(.85)}
+}
+.pop{animation:pop .28s}
+@keyframes pop{35%{transform:scale(1.18) rotate(-4deg)}70%{transform:scale(.94) rotate(4deg)}}
+.msg{min-height:25px;font-weight:bold}
+.muted{font-size:12px;opacity:.75}
+.save{font-size:12px;opacity:.75;margin-top:3px}
+.stats{
+  background:#ffffff12;
+  border:1px solid #ffffff25;
+  border-radius:15px;
+  padding:14px;
+  text-align:left;
+  box-shadow:0 8px 25px #0002;
+}
+.stats h3{margin:0 0 10px;font-size:19px}
+.statrow{display:flex;justify-content:space-between;margin:6px 2px;gap:18px}
+.section{
+  max-width:800px;
+  margin:18px auto;
+  background:#ffffff12;
+  border:1px solid #ffffff25;
+  border-radius:15px;
+  padding:14px;
+}
+.section h2{margin:4px 0 14px}
+.item{
+  display:flex;justify-content:space-between;align-items:center;
+  background:#0003;padding:9px;margin:6px 0;border-radius:10px;
+  text-align:left;gap:10px;
+}
+.float{
+  position:fixed;pointer-events:none;font-weight:bold;font-size:20px;
+  animation:up .8s forwards;z-index:20;
+}
+@keyframes up{to{opacity:0;transform:translateY(-75px) scale(1.2)}}
+button.bad{background:#d62828!important;animation:shake .55s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.pets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.pet{background:#0003;border-radius:12px;padding:12px}
+.owned{outline:2px solid #60a5fa}
+.petIcon{font-size:42px}
+.pet button{width:100%;margin-top:8px}
+@media(max-width:700px){
+  .top{grid-template-columns:1fr;max-width:520px}
+  .stats{max-width:330px;margin:0 auto;width:100%}
+}
+</style>
+</head>
+<body>
+<div class="jax">JAX</div>
+<div class="wrap">
+<h1>🪙 MEGA CLICKER</h1>
+
+<div class="controls">
+<button id="musicBtn">🎵 Lofi Hip-Hop: OFF</button>
+<button id="soundBtn">🔊 Sounds: ON</button>
+<button id="resetBtn">♻️ Reset Game</button>
+</div>
+
+<div class="hotkeys">⌨️ Press <b>SPACE</b> or any <b>ARROW KEY</b> to tap!</div>
+<div id="weatherBox" class="weatherBox">🌤️ Weather: Clear • No mutation active</div>
+
+<div class="top">
+  <div class="clickArea">
+    <div class="level">Level <b id="level">1</b> • XP <b id="xp">0</b>/<b id="next">100</b></div>
+    <div class="coinStage"><div class="coinWrap"><div id="coin" class="coin">🪙</div><div id="upgradePop"></div></div></div>
+    <div id="msg" class="msg">Click the coin!</div>
+    <div>🪙 <b id="coins">0</b> 💎 <b id="gems">0</b> 🔮 <b id="crystals">0</b> 🌌 <b id="stars">0</b></div>
+    <div class="muted">Power <b id="power">1</b> • CPS <b id="cps">0</b></div>
+    <div class="save" id="saveStatus">💾 Auto-save ready</div>
+  </div>
+
+  <div class="stats">
+    <h3>📊 Click Stats</h3>
+    <div class="statrow">Total clicks <b id="clicks">0</b></div>
+    <div class="statrow">Normal <b id="normal">0</b></div>
+    <div class="statrow">🥉 Bronze <b id="bronze">0</b></div>
+    <div class="statrow">🥈 Silver <b id="silver">0</b></div>
+    <div class="statrow">🥇 Gold <b id="gold">0</b></div>
+    <div class="statrow">🚀 Space <b id="space">0</b></div>
+    <div class="statrow">🌌 Cosmic <b id="cosmic">0</b></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🛒 Upgrades</h2>
+  <div id="shop"></div>
+</div>
+
+<div class="section">
+  <h2>🐾 Pets</h2>
+  <div class="muted">Pets boost your clicks.</div>
+  <div id="pets" class="pets"></div>
+</div>
+</div>
+
+<script>
+const defaultState={
+coins:0,gems:0,crystals:0,stars:0,power:1,cps:0,gps:0,crystalps:0,starps:0,
+xp:0,level:1,clicks:0,normal:0,bronze:0,silver:0,gold:0,space:0,cosmic:0,pet:1,
+ownedPets:[],upgradeCounts:[],milestones:{gems:false,crystals:false,stars:false},rewardVersion:0
+};
+
+let s=loadGame();
+s.upgradeCounts=Array.isArray(s.upgradeCounts)?s.upgradeCounts:[];
+s.ownedPets=Array.isArray(s.ownedPets)?s.ownedPets:[];
+s.pet=Number.isFinite(s.pet)?s.pet:1;
+s.milestones=(s.milestones&&typeof s.milestones==="object")?s.milestones:{gems:false,crystals:false,stars:false};
+s.rewardVersion=Number.isFinite(s.rewardVersion)?s.rewardVersion:0;
+
+// One-time progression rewards. Also fixes old saves that already passed these levels.
+function applyMilestoneRewards(){
+  let changed=false;
+  // Versioned rewards make sure older saves/demo saves also receive the
+  // rewards even if they were created before the milestone system existed.
+  if(s.level>=5 && s.rewardVersion<1){
+    s.gems+=25;
+    s.milestones.gems=true;
+    changed=true;
+  }
+  if(s.level>=15 && s.rewardVersion<2){
+    s.crystals+=10;
+    s.milestones.crystals=true;
+    changed=true;
+  }
+  if(s.level>=30 && s.rewardVersion<3){
+    s.stars+=5;
+    s.milestones.stars=true;
+    changed=true;
+  }
+  if(s.level>=30) s.rewardVersion=3;
+  else if(s.level>=15) s.rewardVersion=2;
+  else if(s.level>=5) s.rewardVersion=1;
+  return changed;
+}
+
+const milestoneChanged=applyMilestoneRewards();
+if(milestoneChanged) saveGame();
+
+const U=[
+["💪 Stronger Finger","coins",25,"power",1],
+["🤖 Coin Bot","coins",75,"cps",1],
+["🔥 Golden Finger","coins",500,"power",5],
+["🏭 Coin Factory","coins",2500,"cps",10],
+["⚡ Turbo Factory","coins",10000,"cps",50],
+["👆 Double Tap","coins",50000,"mul",2],
+["🧲 Mega Magnet","coins",250000,"power",50],
+["🏗️ Super Factory","coins",1000000,"cps",250],
+["🚀 Rocket Clicker","coins",5000000,"power",500],
+["🌟 Golden Machine","coins",25000000,"cps",2000],
+["💎 Gem Generator","gems",10,"gps",1],
+["💎 Gem Booster","gems",50,"power",25],
+["💎 Gem Factory","gems",250,"gps",10],
+["💠 Gem Multiplier","gems",1000,"mul",2],
+["💎 Diamond Engine","gems",5000,"gps",100],
+["💎 Gem Reactor","gems",25000,"power",1000],
+["🔮 Crystal Mine","gems",250,"crystalps",1],
+["🔮 Crystal Drill","gems",1000,"crystalps",5],
+["🔮 Crystal Reactor","gems",5000,"power",250],
+["🔮 Crystal Multiplier","gems",25000,"mul",3],
+["🔮 Crystal Factory","gems",100000,"crystalps",100],
+["🌌 Star Engine","crystals",25,"starps",1],
+["🌌 Star Forge","crystals",150,"starps",5],
+["🌠 Galaxy Core","crystals",1000,"power",2500],
+["🌠 Universe Engine","crystals",10000,"starps",100],
+["🌌 Star Booster","crystals",50000,"power",25000],
+["👑 Reality Breaker","stars",100,"mul",10],
+["♾️ Infinite Tap","stars",1000,"mul",25],
+["🌠 Multiverse Machine","stars",10000,"cps",100000],
+["🪐 Omniverse Core","stars",100000,"power",1000000]
+];
+
+let costs=U.map((u,i)=>Math.max(u[2],Math.floor(u[2]*Math.pow(1.72,Number(s.upgradeCounts[i]||0)))));
+
+const P=[
+["🐶","Coin Pup",1000,1.25],
+["🐱","Gem Cat",5000,1.5],
+["🐹","Golden Hamster",15000,1.75],
+["🐲","Dragon",50000,2],
+["🦊","Fox of Fortune",150000,2.5],
+["🦄","Cosmic Unicorn",500000,4],
+["🐉","Galaxy Dragon",5000000,8],
+["🦅","Star Eagle",25000000,12],
+["🐙","Void Octopus",100000000,20],
+["👾","Mega Alien",1000000000,35],
+["🌌","Universe Spirit",10000000000,75]
+];
+
+function loadGame(){
+try{
+const saved=JSON.parse(localStorage.getItem("megaClickerSave"));
+if(saved)return Object.assign({},defaultState,saved);
+}catch(e){}
+return JSON.parse(JSON.stringify(defaultState));
+}
+
+function saveGame(){
+try{
+localStorage.setItem("megaClickerSave",JSON.stringify(s));
+document.getElementById("saveStatus").textContent="💾 Progress saved!";
+setTimeout(()=>document.getElementById("saveStatus").textContent="💾 Auto-save on",900);
+}catch(e){document.getElementById("saveStatus").textContent="⚠️ Save unavailable in this browser";}
+}
+
+function f(n){return Math.floor(n).toLocaleString()}
+function addXP(n){
+const oldLevel=s.level;
+s.xp+=n;
+while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++;}
+if(s.level!==oldLevel && applyMilestoneRewards()){
+  saveGame();
+}
+}
+
+function rare(){
+let r=Math.random();
+if(r<.002&&s.level>=30)return["cosmic",1000,"🌌 COSMIC CLICK!"];
+if(r<.01&&s.level>=20)return["space",50,"🚀 SPACE CLICK!"];
+if(r<.04&&s.level>=10)return["gold",15,"🥇 GOLD CLICK!"];
+if(r<.1&&s.level>=5)return["silver",5,"🥈 SILVER CLICK!"];
+if(r<.22)return["bronze",2,"🥉 BRONZE CLICK!"];
+return["normal",1,"Normal Click!"];
+}
+
+function bad(b,t){
+if(!b)return;
+b.classList.remove("bad");void b.offsetWidth;b.classList.add("bad");
+document.getElementById("msg").textContent="❌ "+t;
+setTimeout(()=>b.classList.remove("bad"),650);
+}
+
+function renderPointers(){
+  const holder=document.getElementById("pointers");
+  if(!holder)return;
+
+  try{
+    const active=[];
+    U.forEach((u,i)=>{
+      const n=Number(s.upgradeCounts[i]||0);
+      if(n>0)active.push({icon:u[0],label:u[1],count:n});
+    });
+
+    if(Array.isArray(s.ownedPets)){
+      s.ownedPets.forEach(i=>{
+        if(P[i])active.push({icon:P[i][0],label:P[i][1],count:1});
+      });
+    }
+
+    holder.innerHTML="";
+    const shown=active.slice(-12);
+    if(!shown.length)return;
+
+    shown.forEach((x,i)=>{
+      const angle=(i/shown.length)*360-90;
+      const r=118;
+      const d=document.createElement("div");
+      d.className="pointer";
+      d.style.transform=`rotate(${angle}deg) translateX(${r}px)`;
+      d.innerHTML=`<span class="pointerIcon" style="transform:rotate(${-angle}deg)">${x.icon}<span class="pointerCount">${x.count}</span></span>`;
+      holder.appendChild(d);
+    });
+  }catch(err){
+    console.warn("Pointer display error:",err);
+  }
+}
+
+function render(){
+  const ids=["coins","gems","crystals","stars","power","cps","clicks","normal","bronze","silver","gold","space","cosmic","level","xp"];
+  ids.forEach(k=>{
+    const el=document.getElementById(k);
+    if(el)el.textContent=f(Number(s[k]||0));
+  });
+  const next=document.getElementById("next");
+  if(next)next.textContent=f(Number(s.level||1)*100);
+
+document.getElementById("shop").innerHTML=U.map((u,i)=>{
+const count=s.upgradeCounts[i]||0;
+return `<div class="item">
+<span>${u[0]} <b>${u[1]}</b> <strong>×${count}</strong><br>
+<span class="muted">Next cost: ${f(costs[i])} ${u[2]}</span></span>
+<span><button data-u="${i}">BUY</button><button data-max="${i}">MAX</button></span>
+</div>`;
+}).join("");
+
+document.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>buy(+b.dataset.u));
+document.querySelectorAll("[data-max]").forEach(b=>b.onclick=()=>buyMax(+b.dataset.max));
+
+document.getElementById("pets").innerHTML=P.map((p,i)=>{
+const owned=s.ownedPets.includes(i);
+return `<div class="pet ${owned?"owned":""}">
+<div class="petIcon">${p[0]}</div><b>${p[1]}</b>
+<div>🪙 ${f(p[2])}</div>
+<button data-p="${i}" ${owned?"disabled":""}>${owned?"OWNED":"GET PET"}</button>
+</div>`;
+}).join("");
+
+document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>pet(+b.dataset.p));
+renderPointers();
+}
+
+function buy(i){
+let b=document.querySelector(`[data-u="${i}"]`);
+if(!canAfford(i))return bad(b,"Not enough "+U[i][1]+"!");
+buyOne(i);
+document.getElementById("msg").textContent="🚀 Upgrade purchased!";
+saveGame();
+render();
+}
+
+function buyMax(i){
+  let bought=0;
+  while(canAfford(i) && bought<10000){
+    buyOne(i);
+    bought++;
+  }
+  if(bought===0){
+    const b=document.querySelector(`[data-max="${i}"]`);
+    bad(b,"Not enough "+U[i][1]+"!");
+  }else{
+    document.getElementById("msg").textContent="🚀 Bought "+bought+" upgrade"+(bought===1?"":"s")+"!";
+    saveGame();
+    render();
+  }
+}
+
+function canAfford(i){
+  const u=U[i];
+  return s[u[1]]>=costs[i];
+}
+
+function buyOne(i){
+  const u=U[i];
+  s[u[1]]-=costs[i];
+  u[3]==="mul"?s.power*=u[4]:s[u[3]]+=u[4];
+  s.upgradeCounts[i]=(s.upgradeCounts[i]||0)+1;
+  costs[i]=Math.ceil(costs[i]*1.72);
+  playSound("buy");
+  showUpgradeOnCoin(u[0]);
+}
+
+function pet(i){
+let p=P[i],b=document.querySelector(`[data-p="${i}"]`);
+if(s.ownedPets.includes(i))return;
+if(s.coins<p[2])return bad(b,"Not enough coins!");
+s.coins-=p[2];
+s.ownedPets.push(i);
+s.pet=Math.max(...s.ownedPets.map(x=>P[x][3]));
+playSound("buy");
+saveGame();
+render();
+}
+
+function showUpgradeOnCoin(icon){
+  const holder=document.getElementById("upgradePop");
+  if(!holder)return;
+  const p=document.createElement("div");
+  p.className="coinUpgrade";
+  p.textContent=icon;
+  holder.appendChild(p);
+  setTimeout(()=>p.remove(),1250);
+}
+
+function tap(e){
+let [k,m,msg]=rare(),g=s.power*m*s.pet*weather.mult;
+s.coins+=g;s.clicks++;s[k]++;
+if(weather.mult>1)msg=weather.icon+" "+weather.name+" x"+weather.mult+"!";
+addXP(Math.max(1,Math.floor(g/2)));
+
+const c=document.getElementById("coin");
+c.classList.remove("pop","bronzeGlow","silverGlow","goldGlow","spaceGlow","cosmicGlow");
+if(m>1){
+  const glow={2:"bronzeGlow",5:"silverGlow",15:"goldGlow",50:"spaceGlow",1000:"cosmicGlow"}[m];
+  if(glow)c.classList.add(glow);
+  else if(weather.mult>1){
+    const wg=weather.mult>=25?"cosmicGlow":weather.mult>=10?"spaceGlow":weather.mult>=5?"goldGlow":weather.mult>=3?"silverGlow":"bronzeGlow";
+    c.classList.add(wg);
+  }
+}
+void c.offsetWidth;c.classList.add("pop");
+setTimeout(()=>c.classList.remove("bronzeGlow","silverGlow","goldGlow","spaceGlow","cosmicGlow"),900);
+document.getElementById("msg").textContent=msg+" +"+f(g)+" 🪙";
+
+const q=document.createElement("span");
+q.className="float";q.textContent="+"+f(g);
+q.style.left=(e?.clientX||window.innerWidth/2)+"px";
+q.style.top=(e?.clientY||200)+"px";
+document.body.appendChild(q);setTimeout(()=>q.remove(),850);
+
+try{render();}catch(err){console.warn("Render error:",err);}
+try{playSound(k==="cosmic"||k==="space"?"rare":"click");}catch(err){}
+}
+
+document.getElementById("coin").addEventListener("click",tap);
+
+document.addEventListener("keydown",e=>{
+if(["INPUT","TEXTAREA","BUTTON"].includes(document.activeElement.tagName))return;
+if(e.code==="Space"||e.key.startsWith("Arrow")){
+e.preventDefault();tap();
+}
+});
+
+setInterval(()=>{
+s.coins+=s.cps*s.pet;
+if(s.level>=5)s.gems+=s.gps;
+if(s.level>=15)s.crystals+=s.crystalps;
+if(s.level>=30)s.stars+=s.starps;
+addXP(Math.floor(s.cps/2));
+render();
+},1000);
+
+setInterval(saveGame,5000);
+
+let audioCtx=null,musicOn=false,soundOn=true,musicTimer=null,step=0;
+let weather={name:"Clear",icon:"🌤️",mult:1,rarity:"Common",ends:0};
+let weatherTimer=null;
+const WEATHER=[
+  {name:"Light Rain",icon:"🌧️",mult:2,rarity:"Common",weight:60,color:"💧"},
+  {name:"Golden Rain",icon:"🌟",mult:3,rarity:"Uncommon",weight:25,color:"✨"},
+  {name:"Star Storm",icon:"🌠",mult:5,rarity:"Rare",weight:10,color:"⭐"},
+  {name:"Cosmic Storm",icon:"🌌",mult:10,rarity:"Epic",weight:4,color:"💜"},
+  {name:"Reality Rift",icon:"🌀",mult:25,rarity:"Mythic",weight:1,color:"🌀"}
+];
+
+function rollWeather(){
+  const roll=Math.random()*100;
+  let total=0, chosen=WEATHER[0];
+  for(const w of WEATHER){
+    total+=w.weight;
+    if(roll<total){chosen=w;break;}
+  }
+  weather={...chosen,ends:Date.now()+30000};
+  updateWeather();
+  spawnWeatherParticles(chosen);
+  document.getElementById("msg").textContent=chosen.icon+" "+chosen.name+"! x"+chosen.mult+" mutation weather!";
+  clearTimeout(weatherTimer);
+  weatherTimer=setTimeout(clearWeather,30000);
+}
+function clearWeather(){
+  weather={name:"Clear",icon:"🌤️",mult:1,rarity:"Common",ends:0};
+  updateWeather();
+}
+function updateWeather(){
+  const box=document.getElementById("weatherBox");
+  if(!box)return;
+  if(weather.mult>1){
+    const left=Math.max(0,Math.ceil((weather.ends-Date.now())/1000));
+    box.className="weatherBox weatherRare";
+    box.innerHTML=weather.icon+" <b>"+weather.name+"</b> • "+weather.rarity+
+      " • <b>x"+weather.mult+"</b> click multiplier • "+left+"s";
+  }else{
+    box.className="weatherBox";
+    box.innerHTML="🌤️ <b>Weather: Clear</b> • No mutation active";
+  }
+}
+function spawnWeatherParticles(w){
+  const count=w.mult>=10?55:w.mult>=5?38:w.mult>=3?28:20;
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const p=document.createElement("div");
+      p.className="weatherParticle";
+      p.textContent=w.icon;
+      p.style.left=Math.random()*100+"vw";
+      p.style.top=(-5-Math.random()*20)+"vh";
+      p.style.fontSize=(12+Math.random()*15)+"px";
+      p.style.animationDuration=(1.8+Math.random()*2.8)+"s";
+      document.body.appendChild(p);
+      setTimeout(()=>p.remove(),5200);
+    },i*45);
+  }
+}
+setInterval(updateWeather,1000);
+setInterval(()=>{if(weather.mult===1)rollWeather()},45000);
+function getAudio(){
+if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+if(audioCtx.state==="suspended")audioCtx.resume();
+return audioCtx;
+}
+
+function tone(freq,duration,type="sine",volume=.035){
+if(!soundOn)return;
+const a=getAudio(),o=a.createOscillator(),g=a.createGain();
+o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(volume,a.currentTime);
+g.gain.exponentialRampToValueAtTime(.001,a.currentTime+duration);
+o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+duration);
+}
+
+function playSound(kind){try{
+if(kind==="buy")tone(520,.12,"triangle",.05);
+else if(kind==="rare"){
+tone(700,.1,"sine",.05);
+setTimeout(()=>tone(1000,.16,"sine",.04),80);
+}
+else tone(330+Math.random()*100,.05,"square",.025);
+}catch(e){} }
+
+function lofiKick(){tone(78,.16,"sine",.07)}
+function lofiSnare(){tone(185,.08,"triangle",.044);tone(90,.05,"sine",.024)}
+function lofiHat(){tone(7000,.018,"square",.008)}
+function lofiBass(freq){tone(freq,.34,"triangle",.028)}
+function lofiChord(notes){
+  if(!soundOn)return;
+  notes.forEach((n,i)=>tone(n,.9,"sine",.013));
+}
+function lofiLead(freq){
+  if(!soundOn)return;
+  tone(freq,.18,"triangle",.014);
+}
+function musicLoop(){
+  if(!musicOn)return;
+  const beat=step%16;
+  const chords=[
+    [261.63,329.63,392.00],
+    [220.00,261.63,329.63],
+    [174.61,220.00,261.63],
+    [196.00,246.94,293.66]
+  ];
+  const bass=[130.81,110.00,87.31,98.00];
+  const melody=[392,440,523.25,440,329.63,392,440,329.63,
+                293.66,329.63,392,329.63,261.63,293.66,329.63,293.66];
+  if(beat%4===0)lofiKick();
+  if(beat===4||beat===12)lofiSnare();
+  if(beat%2===1)lofiHat();
+  if(beat===0||beat===8)lofiChord(chords[Math.floor(step/16)%4]);
+  if(beat===0||beat===4||beat===8||beat===12)lofiBass(bass[Math.floor(step/16)%4]);
+  if(beat%2===0)lofiLead(melody[beat]);
+  step++;
+  musicTimer=setTimeout(musicLoop,230);
+}
+
+document.getElementById("musicBtn").onclick=()=>{
+musicOn=!musicOn;
+document.getElementById("musicBtn").textContent="🎵 Lofi Hip-Hop: "+(musicOn?"ON":"OFF");
+if(musicOn){getAudio();step=0;musicLoop();}
+else{clearTimeout(musicTimer);}
+};
+
+document.getElementById("soundBtn").onclick=()=>{
+soundOn=!soundOn;
+document.getElementById("soundBtn").textContent="🔊 Sounds: "+(soundOn?"ON":"OFF");
+if(soundOn){getAudio();tone(660,.1);}
+};
+
+document.getElementById("resetBtn").onclick=()=>{
+if(confirm("Reset ALL Mega Clicker progress?")){
+localStorage.removeItem("megaClickerSave");
+location.reload();
+}
+};
+
+render();
+updateWeather();
+</script>
+</body>
+</html>
