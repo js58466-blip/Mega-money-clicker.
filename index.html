@@ -660,7 +660,8 @@ document.getElementById("signInBtn").onclick=async()=>{
   const {error}=await sb.auth.signInWithPassword({email,password});
   authMessage(error?"❌ "+error.message:"✅ Signed in!");
 };
-document.getElementById("signUpBtn").onclick=async()=>{
+document.const {data,error}=await sb.auth.signUp({email,password,options:{data:{username}}});
+  if(error){authMessage("❌ "+error.message);return};getElementById("signUpBtn").onclick=async()=>{
   if(!onlineReady())return authMessage("Paste your Supabase publishable key into index.html first.");
   const email=document.getElementById("authEmail").value.trim();
   const password=document.getElementById("authPassword").value;
