@@ -1,0 +1,1361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coin Clicker</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:linear-gradient(135deg,#111827,#312e81);color:#fff;text-align:center;overflow-x:hidden}body.world2{background:radial-gradient(circle at 50% 20%,#86efac22 0 12%,transparent 42%),radial-gradient(circle at 20% 80%,#facc1520 0 10%,transparent 38%),linear-gradient(135deg,#031b12,#064e3b 45%,#022c1b);position:relative;overflow-x:hidden}body.world2:before{content:"💵      💵          💵      💵          💵\A     💵          💵      💵          💵      💵\A💵          💵      💵          💵      💵\A     💵      💵          💵      💵          💵\A💵          💵      💵          💵      💵";white-space:pre;position:fixed;inset:-50px;z-index:0;font-size:78px;line-height:2.05;letter-spacing:12px;opacity:.22;transform:rotate(-8deg) scale(1.12);pointer-events:none;filter:drop-shadow(0 5px 8px #0009)}body.world2:after{content:"$   $       $          $    $       $          $\A      $        $    $        $       $\A $       $         $     $        $      $\A    CASH      MONEY      CASH      MONEY";white-space:pre;position:fixed;inset:-40px;z-index:0;font-size:52px;line-height:3.15;letter-spacing:24px;opacity:.10;transform:rotate(7deg);pointer-events:none;color:#fde68a;text-shadow:0 0 18px #22c55e,0 2px 3px #0008}body.world2 .wrap,body.world2 .jax,body.world2 .adminBtn,body.world2 .adminNote{position:relative;z-index:1}.world2 .section,.world2 .stats,.world2 .emailBox{background:#052e1bcc;border-color:#86efac55}.world2 .rebirthBox{background:linear-gradient(135deg,#065f4633,#22c55e2b);border-color:#86efac66}.world2 .hotkeys{background:#022c22dd}.world2 .worldNotice{background:#22c55e2b;border-color:#bbf7d066}.world2 .coin{box-shadow:0 8px 25px #0008,0 0 35px #86efac99}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 20px 40px}
+.jax{position:fixed;top:10px;left:12px;z-index:30;font-size:12px;font-weight:800;letter-spacing:1px;line-height:1.45;background:#4f46e5aa;color:#ffffffbb;padding:6px 9px;border-radius:7px;box-shadow:0 3px 10px #0003;opacity:.72;text-align:left}
+.adminBtn{position:fixed;top:12px;right:14px;z-index:30;background:linear-gradient(135deg,#f59e0b,#b45309);border:1px solid #fde68a;box-shadow:0 4px 15px #0006;font-size:14px}
+.adminBtn.unlocked{background:linear-gradient(135deg,#22c55e,#15803d);border-color:#86efac}
+.adminNote{position:fixed;top:58px;right:14px;width:360px;max-height:80vh;overflow:auto;z-index:40;background:#111827;border:2px solid #f59e0b;border-radius:14px;padding:16px;box-shadow:0 10px 35px #0009;display:none;text-align:center}
+.adminNote.show{display:block;animation:adminPop .2s ease-out}
+.adminNote h3{margin:0 0 8px;font-size:20px}
+.adminNote p{margin:6px 0;font-size:13px;line-height:1.4}
+.adminUnlocked{color:#86efac;font-weight:bold}
+.adminCmd{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}
+.adminCmd button{font-size:11px;padding:8px 6px;background:#312e81;border:1px solid #ffffff22}
+.adminCmd button:hover{background:#4338ca}
+.adminDanger{background:#991b1b!important}
+.adminHall{background:#0b1225;border:1px solid #ffffff18;border-radius:10px;padding:8px;margin:8px 0;text-align:left;font-size:11px;max-height:110px;overflow:auto}
+.adminStatus{font-size:12px;color:#fde68a;min-height:18px;margin:6px 0}
+@keyframes adminPop{from{opacity:0;transform:translateY(-8px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.mondayBox{max-width:650px;margin:7px auto 8px;background:linear-gradient(135deg,#f59e0b33,#facc1533);border:1px solid #facc15aa;border-radius:11px;padding:9px 12px;font-size:15px;font-weight:800;box-shadow:0 0 18px #facc1533}
+.weatherBox{max-width:650px;margin:7px auto 8px;background:#ffffff10;border:1px solid #ffffff20;border-radius:11px;padding:8px 12px;font-size:13px}
+.weatherBox b{font-size:15px}.weatherRare{animation:weatherPulse 1.8s infinite alternate}
+.rebirthBox{max-width:650px;margin:10px auto 14px;background:linear-gradient(135deg,#7c3aed22,#ec489922);border:1px solid #ffffff30;border-radius:14px;padding:12px}
+.rebirthBox button{margin-top:8px;background:#b026ff}.rebirthBox button:disabled{filter:grayscale(1)}
+@keyframes weatherPulse{to{box-shadow:0 0 22px #ffffff33}}
+.coinStage{position:relative;width:330px;height:270px;margin:0 auto}
+.weatherParticle{position:fixed;pointer-events:none;z-index:10;animation:weatherFall linear forwards}
+@keyframes weatherFall{from{transform:translateY(-20px);opacity:0}12%{opacity:.9}to{transform:translateY(105vh);opacity:0}}
+h1{margin:0 0 16px;font-size:30px}.controls{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}.worldBtn{background:linear-gradient(135deg,#16a34a,#166534);border:1px solid #86efac}.worldBtn.locked{background:linear-gradient(135deg,#475569,#1e293b);border-color:#94a3b8}.worldBtn.active{background:linear-gradient(135deg,#22c55e,#15803d);box-shadow:0 0 16px #22c55e66}.worldNotice{max-width:650px;margin:7px auto 10px;background:#16a34a22;border:1px solid #86efac55;border-radius:11px;padding:8px 12px;font-size:13px;font-weight:700}
+button{background:#4f46e5;color:#fff;border:0;border-radius:9px;padding:9px 13px;font-weight:bold;cursor:pointer}
+button:hover{filter:brightness(1.15)}button:disabled{opacity:.5;cursor:not-allowed}
+.hotkeys{max-width:650px;margin:8px auto 10px;background:#0d1429;border-radius:12px;padding:10px}
+.top{display:grid;grid-template-columns:1fr 220px;gap:14px;max-width:720px;margin:0 auto 18px;align-items:center}
+.clickArea{padding:0 8px}.level{margin:2px 0 4px}
+.coin{width:150px;height:150px;border-radius:50%;margin:16px auto 9px;display:flex;align-items:center;justify-content:center;font-size:60px;background:linear-gradient(145deg,#ffe066,#d99a00);border:8px solid #fff1a8;box-shadow:0 8px 25px #0008;cursor:pointer;user-select:none;transition:.1s}
+.coin:active{transform:scale(.87)}.coinWrap{position:relative;width:170px;height:178px;margin:0 auto}.coinWrap .coin{margin:16px auto 9px}
+.coinUpgrade{position:absolute;left:50%;top:58px;transform:translate(-50%,-50%) scale(.7);font-size:30px;pointer-events:none;z-index:5;opacity:0;animation:upgradePop 1.25s forwards;text-shadow:0 3px 8px #000}
+@keyframes upgradePop{0%{opacity:0;transform:translate(-50%,-50%) scale(.45)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}45%{opacity:1;transform:translate(-50%,-70%) scale(1)}100%{opacity:0;transform:translate(-50%,-130%) scale(.85)}}
+.pop{animation:pop .28s}@keyframes pop{35%{transform:scale(1.18) rotate(-4deg)}70%{transform:scale(.94) rotate(4deg)}}
+.msg{min-height:25px;font-weight:bold}.muted{font-size:12px;opacity:.75}.compactNumber{cursor:help;border-bottom:1px dotted #ffffff55}.save{font-size:12px;opacity:.75;margin-top:3px}
+.infoBoxes{display:flex;gap:14px;align-items:stretch}.stats,.emailBox{background:#ffffff12;border:1px solid #ffffff25;border-radius:15px;padding:14px;text-align:left;box-shadow:0 8px 25px #0002}.stats{flex:1}.emailBox{width:220px;display:flex;flex-direction:column;justify-content:center}.emailBox h3{margin:0 0 8px;font-size:18px}.emailBox p{font-size:12px;line-height:1.35;margin:0 0 10px;opacity:.8}.emailBox a{display:block;text-align:center;background:#4f46e5;color:#fff;text-decoration:none;border-radius:9px;padding:9px 10px;font-weight:bold}.emailBox a:hover{filter:brightness(1.15)}
+.stats h3{margin:0 0 10px;font-size:19px}.statrow{display:flex;justify-content:space-between;margin:6px 2px;gap:18px}
+.section{max-width:800px;margin:18px auto;background:#ffffff12;border:1px solid #ffffff25;border-radius:15px;padding:14px}.section h2{margin:4px 0 14px}
+.item{display:flex;justify-content:space-between;align-items:center;background:#0003;padding:9px;margin:6px 0;border-radius:10px;text-align:left;gap:10px}
+.float{position:fixed;pointer-events:none;font-weight:bold;font-size:20px;animation:up .8s forwards;z-index:20}
+@keyframes up{to{opacity:0;transform:translateY(-75px) scale(1.2)}}button.bad{background:#d62828!important;animation:shake .55s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.pets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;max-height:500px;overflow-y:auto;padding:6px}.pet{background:#0003;border-radius:12px;padding:10px;font-size:12px}.owned{outline:2px solid #60a5fa;background:#ffffff0f}
+.lockedUpgrade{opacity:.62;filter:saturate(.65)}.lockedUpgrade .lockText{color:#fbbf24;font-weight:bold}.reqBadge{font-size:11px;color:#fbbf24}.petIcon{font-size:38px}.pet button{width:100%;margin-top:6px;font-size:11px;padding:6px 4px}
+@media(max-width:700px){.top{grid-template-columns:1fr;max-width:520px}.infoBoxes{flex-direction:column}.stats,.emailBox{max-width:330px;width:100%;margin:0 auto}.adminNote{width:calc(100vw - 28px)}.adminCmd{grid-template-columns:1fr}}
+
+#ownerOverlay{position:fixed;inset:0;background:#0009;z-index:100;display:none;align-items:center;justify-content:center;padding:14px}
+#ownerPanel{width:min(900px,96vw);max-height:92vh;overflow:auto;background:#0b1225;border:2px solid #a78bfa;border-radius:18px;padding:18px;box-shadow:0 20px 70px #000; text-align:left}
+#ownerPanel h2{margin:0 0 4px;text-align:center;color:#c4b5fd}
+.ownerSub{text-align:center;font-size:12px;opacity:.7;margin-bottom:12px}
+.ownerGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.ownerCard{background:#ffffff0d;border:1px solid #ffffff18;border-radius:12px;padding:10px}
+.ownerCard h3{font-size:14px;margin:0 0 8px}
+.ownerRow{display:flex;gap:6px;flex-wrap:wrap}
+.ownerRow input,.ownerRow select{flex:1;min-width:110px;background:#111827;color:#fff;border:1px solid #ffffff25;border-radius:8px;padding:8px}
+.ownerRow button{flex:1;min-width:110px;font-size:11px}
+.ownerWide{grid-column:1/-1}
+#ownerStatus{min-height:20px;text-align:center;color:#86efac;font-weight:bold;margin:8px 0}
+.ownerDanger{background:#991b1b!important}
+@media(max-width:700px){.ownerGrid{grid-template-columns:1fr}}
+
+
+/* SECOND PERSON ADMIN */
+#secondAdminOverlay{position:fixed;inset:0;background:#0009;z-index:95;display:none;align-items:center;justify-content:center;padding:14px}
+#secondAdminPanel{width:min(760px,96vw);max-height:90vh;overflow:auto;background:#111827;border:2px solid #60a5fa;border-radius:18px;padding:18px;box-shadow:0 20px 70px #000;text-align:left}
+#secondAdminPanel h2{margin:0 0 4px;text-align:center;color:#93c5fd}
+.secondAdminSub{text-align:center;font-size:12px;opacity:.75;margin-bottom:12px}
+.secondAdminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.secondAdminCard{background:#ffffff0d;border:1px solid #ffffff18;border-radius:12px;padding:10px}
+.secondAdminCard h3{font-size:14px;margin:0 0 8px}
+.secondAdminRow{display:flex;gap:6px;flex-wrap:wrap}
+.secondAdminRow input,.secondAdminRow select{flex:1;min-width:110px;background:#0f172a;color:#fff;border:1px solid #ffffff25;border-radius:8px;padding:8px}
+.secondAdminRow button{flex:1;min-width:120px;font-size:11px}
+#secondAdminStatus{min-height:20px;text-align:center;color:#93c5fd;font-weight:bold;margin:8px 0}
+.secondAdminClose{margin-top:12px;text-align:center}
+@media(max-width:700px){.secondAdminGrid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="jax">Jax Schatz<br>Jacoby M<br>Luke F</div>
+<button id="adminBtn" class="adminBtn">👑 ADMIN</button>
+<div id="adminNote" class="adminNote">
+<h3>👑 Admin Panel</h3>
+<p id="adminNoteText">🔒 You need 250 rebirths to unlock Admin!</p>
+<div id="adminPanel" style="display:none">
+<div class="adminStatus" id="adminStatus"></div>
+<div class="adminCmd">
+<button onclick="adminX100Clicks()">🖱️ x100 Clicks</button>
+<button onclick="adminMillionPower()">⚡ x1,000,000 Power</button>
+<button onclick="adminExplode()">💥 Explode Coin</button>
+<button onclick="adminMoveCoin()">🌀 Move Coin</button>
+<button onclick="adminAddHall()">🏆 Add to 250-Rebirth List</button>
+<button onclick="adminToggleAuto()">🤖 Auto Clicker: OFF</button>
+<button onclick="adminAllUpgrades()">🎁 Give All Upgrades</button>
+<button onclick="adminBillionCoins()">💰 x10,000,000,000 Coins</button>
+</div>
+<div><b>🏆 250 Rebirth Hall of Fame</b></div>
+<div id="adminHall" class="adminHall">Nobody has been added yet.</div>
+<button onclick="closeAdminNote()">Close</button>
+</div>
+<div id="adminLockedClose"><button onclick="closeAdminNote()">Close</button></div>
+</div>
+
+<div id="ownerOverlay">
+  <div id="ownerPanel">
+    <h2>👑🔐 PRIVATE OWNER PANEL</h2>
+    <div class="ownerSub">Owner controls • Session-only unlock • Ctrl+Shift+O</div>
+    <div id="ownerStatus">Owner Panel locked.</div>
+    <div class="ownerGrid">
+      <div class="ownerCard">
+        <h3>💰 Give Currency</h3>
+        <div class="ownerRow">
+          <input id="ownerAmount" type="text" value="1000000" placeholder="Amount">
+        </div>
+        <div class="ownerRow" style="margin-top:6px">
+          <button onclick="ownerGive('coins')">🪙 Coins</button>
+          <button onclick="ownerGive('gems')">💎 Gems</button>
+          <button onclick="ownerGive('crystals')">🔮 Crystals</button>
+          <button onclick="ownerGive('stars')">🌌 Stars</button>
+        </div>
+      </div>
+      <div class="ownerCard">
+        <h3>⚡ Set Stats</h3>
+        <div class="ownerRow">
+          <input id="ownerPower" type="text" value="1000000" placeholder="Power">
+          <button onclick="ownerSet('power')">Set Power</button>
+        </div>
+        <div class="ownerRow" style="margin-top:6px">
+          <input id="ownerLevel" type="number" value="100" placeholder="Level">
+          <button onclick="ownerSet('level')">Set Level</button>
+        </div>
+        <div class="ownerRow" style="margin-top:6px">
+          <input id="ownerRebirths" type="number" value="250" placeholder="Rebirths">
+          <button onclick="ownerSet('rebirths')">Set Rebirths</button>
+        </div>
+        <div class="ownerRow" style="margin-top:6px">
+          <input id="ownerMultiplier" type="number" value="100" placeholder="Multiplier">
+          <button onclick="ownerSet('multiplier')">Set Multiplier</button>
+        </div>
+      </div>
+      <div class="ownerCard">
+        <h3>🎁 Unlocks</h3>
+        <div class="ownerRow">
+          <button onclick="ownerAllUpgrades()">🎁 All Upgrades</button>
+          <button onclick="ownerAllPets()">🐾 All Pets</button>
+          <button onclick="ownerMaxEverything()">🔥 MAX EVERYTHING</button>
+        </div>
+      </div>
+      <div class="ownerCard">
+        <h3>🌎 World & Weather</h3>
+        <div class="ownerRow">
+          <button onclick="ownerWorld(1)">🪙 Coin World</button>
+          <button onclick="ownerWorld(2)">💵 Dollar World</button>
+        </div>
+        <div class="ownerRow" style="margin-top:6px">
+          <select id="ownerWeather">
+            <option value="clear">🌤️ Clear</option>
+            <option value="2">🌧️ Light Rain x2</option>
+            <option value="3">🌟 Golden Rain x3</option>
+            <option value="5">🌠 Star Storm x5</option>
+            <option value="10">🌌 Cosmic Storm x10</option>
+            <option value="10">🌌 Cosmic Storm x10</option>
+            <option value="25">🌀 Reality Rift x25</option>
+          </select>
+          <button onclick="ownerSetWeather()">Set Weather</button>
+        </div>
+      </div>
+      <div class="ownerCard">
+        <h3>🤖 Admin/Tools</h3>
+        <div class="ownerRow">
+          <button onclick="ownerToggleAuto()">🤖 Owner Auto Click</button>
+          <button onclick="ownerSave()">💾 Force Save</button>
+          <button onclick="ownerExplode()">💥 Explode Coin</button>
+          <button onclick="ownerMove()">🌀 Move Coin</button>
+        </div>
+      </div>
+      <div class="ownerCard ownerWide">
+        <h3>⚠️ Notes</h3>
+        <div class="muted">The Owner Panel unlock lasts until this page is reloaded. GitHub Pages is client-side, so this is a convenience owner panel rather than true server-side security.</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <button onclick="ownerLock()">Close Owner Panel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- SECOND PERSON ADMIN PANEL -->
+<div id="secondAdminOverlay">
+  <div id="secondAdminPanel">
+    <h2>🛡️ SECOND PERSON ADMIN</h2>
+    <div class="secondAdminSub">Limited helper controls • Ctrl + Shift + Search + S • Password required</div>
+    <div id="secondAdminStatus">Ready.</div>
+
+    <div class="secondAdminGrid">
+      <div class="secondAdminCard">
+        <h3>💰 Small Currency Boosts</h3>
+        <div class="secondAdminRow">
+          <button onclick="secondAdminGiveCoins()">🪙 +25,000 Coins</button>
+          <button onclick="secondAdminGiveGems()">💎 +10 Gems</button>
+          <button onclick="secondAdminGiveCrystal()">🔮 +2 Crystals</button>
+          <button onclick="secondAdminGiveStar()">🌌 +1 Star</button>
+        </div>
+      </div>
+
+      <div class="secondAdminCard">
+        <h3>⚡ Small Power Boosts</h3>
+        <div class="secondAdminRow">
+          <button onclick="secondAdminClicks()">🖱️ +250 Clicks</button>
+          <button onclick="secondAdminPower()">⚡ Limited Power Boost</button>
+        </div>
+      </div>
+
+      <div class="secondAdminCard">
+        <h3>🌦️ Weather</h3>
+        <div class="secondAdminRow">
+          <select id="secondAdminWeather">
+            <option value="clear">🌤️ Clear</option>
+            <option value="2">🌧️ Light Rain x2</option>
+            <option value="3">🌟 Golden Rain x3</option>
+            <option value="5">🌠 Star Storm x5</option>
+            <option value="10">🌌 Cosmic Storm x10</option>
+          </select>
+          <button onclick="secondAdminSetWeather()">Set Weather</button>
+        </div>
+      </div>
+
+      <div class="secondAdminCard">
+        <h3>🌀 Fun Tools</h3>
+        <div class="secondAdminRow">
+          <button onclick="secondAdminMove()">🌀 Move Coin</button>
+          <button onclick="secondAdminExplode()">💥 Coin Effect</button>
+        </div>
+      </div>
+
+      <div class="secondAdminCard">
+        <h3>💾 Save</h3>
+        <div class="secondAdminRow">
+          <button onclick="secondAdminSave()">💾 Force Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="secondAdminClose">
+      <button onclick="secondAdminClose()">Close Second Admin</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+<div style="max-width:650px;margin:0 auto 12px;background:linear-gradient(135deg,#ec489933,#f59e0b33);border:2px solid #f59e0b;border-radius:14px;padding:12px;font-size:16px;font-weight:800;box-shadow:0 0 20px #f59e0b33">🌮🚀 LIMITED PET ALERT! The <b>SPACE TACO</b> is available for a limited time only! ⏰<br><span id="spaceTacoTimer" style="font-size:13px;opacity:.9">Loading 1-week timer...</span></div>
+<h1 id="gameTitle">🪙 COIN CLICKER</h1>
+<div class="controls">
+<button id="worldBtn" class="worldBtn">💵 Dollar World: ENTER</button>
+<button id="musicBtn">🎵 Lofi Hip Hop: OFF</button>
+<button id="soundBtn">🔊 Sounds: ON</button>
+</div>
+<div id="worldNotice" class="worldNotice">🌎 World 1: Coin World • Reach 100 Coin World rebirths to unlock Dollar World!</div>
+<div class="hotkeys">⌨️ Press <b>SPACE</b> or any <b>ARROW KEY</b> to tap!</div>
+<div id="mondayBox" class="mondayBox">⚡ PLAY ON MONDAY FOR 3X CLICKS! ⚡</div>
+<div id="weatherBox" class="weatherBox">🌤️ Weather: Clear • No mutation active</div>
+<div class="rebirthBox">
+<div><b>♻️ Rebirths: <span id="rebirths">0</span></b><span class="muted"> • Rebirths reset your current world; multiplier resets to ×1</span></div>
+<div class="muted" id="rebirthInfo">Coin World starts at 100,000 coins per first rebirth. Dollar World starts its own rebirths at 100,000 dollars.</div>
+<button id="rebirthBtn">♻️ REBIRTH</button>
+</div>
+<div class="top">
+<div class="clickArea">
+<div class="level">Level <b id="level">1</b> • XP <b id="xp">0</b>/<b id="next">100</b></div>
+<div class="coinStage"><div class="coinWrap"><div id="coin" class="coin">🪙</div><div id="upgradePop"></div></div></div>
+<div id="msg" class="msg">Click the coin!</div><div id="purchaseNotice" class="msg" style="margin-top:8px;font-weight:800;">No upgrades purchased yet.</div>
+<div><span id="currencyIcon">🪙</span> <b id="coins">0</b> <span id="currencyLabel"></span> 💎 <b id="gems">0</b> 🔮 <b id="crystals">0</b> 🌌 <b id="stars">0</b></div>
+<div class="muted"><span id="powerLabel">Power</span> <b id="power">1</b> • CPS <b id="cps">0</b></div>
+<div class="save" id="saveStatus">💾 Auto-save ready</div>
+</div>
+<div class="infoBoxes">
+<div class="stats">
+<h3>📊 Click Stats</h3>
+<div class="statrow">Total clicks <b id="clicks">0</b></div>
+<div class="statrow">Normal <b id="normal">0</b></div>
+<div class="statrow">🥉 Bronze <b id="bronze">0</b></div>
+<div class="statrow">🥈 Silver <b id="silver">0</b></div>
+<div class="statrow">🥇 Gold <b id="gold">0</b></div>
+<div class="statrow">🚀 Space <b id="space">0</b></div>
+<div class="statrow">🌌 Cosmic <b id="cosmic">0</b></div>
+</div>
+<div class="emailBox">
+<h3>💡 Got an idea?</h3>
+<p>Email me for ideas!!</p>
+<a href="mailto:js58466@gmail.com?subject=Coin%20Clicker%20Idea">📧 Email Me</a>
+</div>
+</div></div>
+<div class="section"><h2>🛒 Upgrades</h2><div id="shop"></div></div>
+<div id="petSection" class="section"><h2>🐾 Pets (<span id="petCount">0</span>/<span id="petTotal">43</span>)</h2><div id="petHelp" class="muted">Pets stay with you FOREVER, even after Rebirths! Highest owned pet multiplier automatically active!</div><div id="pets" class="pets"></div></div>
+</div>
+
+<script>
+const defaultState={coins:"0",gems:"0",crystals:"0",stars:"0",power:"1",cps:"0",gps:"0",crystalps:"0",starps:"0",xp:0,level:1,clicks:0,normal:0,bronze:0,silver:0,gold:0,space:0,cosmic:0,pet:1,ownedPets:[],upgradeCounts:[],milestones:{gems:false,crystals:false,stars:false},rewardVersion:0,rebirths:0,coinRebirths:0,dollarRebirths:0,dollarWorldStarted:false,rebirthMultiplier:1,coinRebirthMultiplier:1,dollarRebirthMultiplier:1,adminUnlocked:false,adminHall:[],autoClicker:false,lastPurchase:"",coinOffsetX:0,coinOffsetY:0,spaceTacoStart:0,world:1,dollarPet:1,dollarOwnedPets:[],world2:{dollars:"0",power:"1",cps:"0",upgradeCounts:[]}};
+const BIG_KEYS=["coins","gems","crystals","stars","power","cps","gps","crystalps","starps"];
+const REBIRTH_BASE_COST=100000n;
+const IS_GITHUB=location.hostname.endsWith("github.io");
+const SAVE_KEY=IS_GITHUB?"coinClickerSave":"coinClickerPreviewSave_v8";
+
+function getRebirthCost(){
+  let cost=REBIRTH_BASE_COST;
+  for(let i=0;i<s.rebirths;i++) cost = (cost*42n+9n)/10n;
+  return cost;
+}
+
+function getRebirthMultiplierNum(){
+  const m=Number.isFinite(Number(s.rebirthMultiplier))?Number(s.rebirthMultiplier):1;
+  return BigInt(Math.max(1,Math.round(m))*100);
+}
+
+let s=loadGame();
+BIG_KEYS.forEach(k=>{try{s[k]=BigInt(String(s[k]??0))}catch(e){s[k]=0n}});
+s.rebirths=Number.isInteger(s.rebirths)?s.rebirths:0;
+s.coinRebirths=Number.isInteger(s.coinRebirths)?s.coinRebirths:0;
+s.dollarRebirths=Number.isInteger(s.dollarRebirths)?s.dollarRebirths:0;
+s.dollarWorldStarted=Boolean(s.dollarWorldStarted);
+s.rebirthMultiplier=Number.isFinite(Number(s.rebirthMultiplier))?Number(s.rebirthMultiplier):1;
+s.coinRebirthMultiplier=Number.isFinite(Number(s.coinRebirthMultiplier))?Number(s.coinRebirthMultiplier):1;
+s.dollarRebirthMultiplier=Number.isFinite(Number(s.dollarRebirthMultiplier))?Number(s.dollarRebirthMultiplier):1;
+// Keep older saves compatible with the new separate world multipliers.
+if(s.world===2){s.dollarRebirthMultiplier=s.rebirthMultiplier||s.dollarRebirthMultiplier;}else{s.coinRebirthMultiplier=s.rebirthMultiplier||s.coinRebirthMultiplier;}
+s.rebirthMultiplier=s.world===2?s.dollarRebirthMultiplier:s.coinRebirthMultiplier;
+s.adminUnlocked=Boolean(s.adminUnlocked);if(s.rebirths>=250)s.adminUnlocked=true;
+s.adminHall=Array.isArray(s.adminHall)?s.adminHall:[];s.autoClicker=Boolean(s.autoClicker);
+s.coinOffsetX=Number(s.coinOffsetX)||0;s.coinOffsetY=Number(s.coinOffsetY)||0;
+s.spaceTacoStart=Number(s.spaceTacoStart)||Date.now();
+function updateSpaceTacoTimer(){const el=document.getElementById("spaceTacoTimer");if(!el)return;const left=Math.max(0,7*24*60*60*1000-(Date.now()-s.spaceTacoStart));if(left<=0){el.textContent="⏰ SPACE TACO EVENT ENDED";return}const d=Math.floor(left/86400000),h=Math.floor(left%86400000/3600000),m=Math.floor(left%3600000/60000),sec=Math.floor(left%60000/1000);el.textContent=`⏳ Time remaining: ${d}d ${h}h ${m}m ${sec}s`;}
+setInterval(updateSpaceTacoTimer,1000);
+s.upgradeCounts=Array.isArray(s.upgradeCounts)?s.upgradeCounts:[];s.world=Number(s.world)===2?2:1;s.world2=(s.world2&&typeof s.world2==="object")?s.world2:{dollars:"0",power:"1",cps:"0",upgradeCounts:[]};try{s.world2.dollars=BigInt(String(s.world2.dollars??0));s.world2.power=BigInt(String(s.world2.power??1));s.world2.cps=BigInt(String(s.world2.cps??0))}catch(e){s.world2={dollars:0n,power:1n,cps:0n,upgradeCounts:[]}}s.world2.upgradeCounts=Array.isArray(s.world2.upgradeCounts)?s.world2.upgradeCounts:[];s.world=Number(s.world)===2?2:1;s.world2.dollars=BigInt(String(s.world2.dollars??0));s.world2.power=BigInt(String(s.world2.power??1));s.world2.cps=BigInt(String(s.world2.cps??0));s.ownedPets=Array.isArray(s.ownedPets)?s.ownedPets:[];s.pet=Number.isFinite(s.pet)?s.pet:1;s.dollarOwnedPets=Array.isArray(s.dollarOwnedPets)?s.dollarOwnedPets:[];s.dollarPet=Number.isFinite(s.dollarPet)?s.dollarPet:1;
+s.milestones=(s.milestones&&typeof s.milestones==="object")?s.milestones:{gems:false,crystals:false,stars:false};s.rewardVersion=Number.isFinite(s.rewardVersion)?s.rewardVersion:0;
+// Migrate older saves to separate Coin World and Dollar World rebirth counters.
+if(s.coinRebirths===0 && s.dollarRebirths===0){
+  if(s.world===2){s.coinRebirths=Math.max(100,s.rebirths);s.dollarRebirths=0;s.dollarWorldStarted=false;}
+  else{s.coinRebirths=s.rebirths;s.dollarRebirths=0;s.dollarWorldStarted=false;}
+}
+s.rebirths=s.world===2?s.dollarRebirths:s.coinRebirths;
+s.adminUnlocked=s.coinRebirths>=250 || s.adminUnlocked;
+if(!IS_GITHUB&&!localStorage.getItem(SAVE_KEY)){s.coinRebirths=100;s.dollarRebirths=0;s.dollarWorldStarted=true;s.rebirths=100;s.rebirthMultiplier=1;s.coinRebirthMultiplier=1;s.dollarRebirthMultiplier=1;s.adminUnlocked=true;s.world=1;s.coins=1000000n;s.gems=100n;s.crystals=50n;s.stars=10n;s.power=1n;s.cps=0n;s.gps=0n;s.crystalps=0n;s.starps=0n;s.upgradeCounts=[];s.world2={dollars:0n,power:1n,cps:0n,upgradeCounts:[]};}
+
+function recalculatePetMultiplier(){
+  if(!s.ownedPets || s.ownedPets.length===0){ s.pet=1; return; }
+  let maxMult = 1;
+  s.ownedPets.forEach(idx => {
+    if(P[idx] && P[idx][3] > maxMult) maxMult = P[idx][3];
+  });
+  s.pet = maxMult;
+}
+
+function applyMilestoneRewards(){let changed=false;if(s.level>=5&&s.rewardVersion<1){s.gems+=25n;s.milestones.gems=true;changed=true}if(s.level>=15&&s.rewardVersion<2){s.crystals+=10n;s.milestones.crystals=true;changed=true}if(s.level>=30&&s.rewardVersion<3){s.stars+=5n;s.milestones.stars=true;changed=true}if(s.level>=30)s.rewardVersion=3;else if(s.level>=15)s.rewardVersion=2;else if(s.level>=5)s.rewardVersion=1;return changed}
+const milestoneChanged=applyMilestoneRewards();if(milestoneChanged)saveGame();
+
+const U=[
+["💪 Stronger Finger","coins",25,"power",1,0],["🤖 Coin Bot","coins",75,"cps",1,0],["🔥 Golden Finger","coins",400,"power",4,0],["🏭 Coin Factory","coins",1800,"cps",8,0],["⚡ Turbo Factory","coins",8000,"cps",35,0],["👆 Double Tap","coins",35000,"mul",2,0],["🧲 Mega Magnet","coins",150000,"power",40,1],["🏗️ Super Factory","coins",750000,"cps",180,1],["🚀 Rocket Clicker","coins",3500000,"power",350,2],["🌟 Golden Machine","coins",18000000,"cps",1200,2],["💥 Mega Punch","coins",80000000,"power",1800,3],["⚙️ Hyper Mint","coins",350000000,"cps",9000,3],["🌋 Coin Volcano","coins",1800000000,"power",10000,4],["🏦 Billionaire Bank","coins",8000000000,"cps",60000,5],["☄️ Meteor Mint","coins",35000000000,"power",75000,6],["🌌 Cosmic Coin Press","coins",180000000000,"cps",500000,7],["🌀 Reality Coiner","coins",800000000000,"power",750000,8],["👑 Royal Mint","coins",3500000000000,"cps",3500000,10],["♾️ Infinite Mint","coins",18000000000000,"power",7500000,12],["🌠 Multiverse Mint","coins",80000000000000,"cps",35000000,15],
+["💎 Gem Generator","gems",10,"gps",1,0],["💎 Gem Booster","gems",40,"power",20,1],["💎 Gem Factory","gems",200,"gps",8,2],["💠 Gem Multiplier","gems",800,"mul",2,3],["💎 Diamond Engine","gems",4000,"gps",75,4],["💎 Gem Reactor","gems",20000,"power",800,5],
+["🔮 Crystal Mine","gems",200,"crystalps",1,3],["🔮 Crystal Drill","gems",800,"crystalps",4,4],["🔮 Crystal Reactor","gems",4000,"power",200,5],["🔮 Crystal Multiplier","gems",20000,"mul",3,6],["🔮 Crystal Factory","gems",80000,"crystalps",80,7],
+["🌌 Star Engine","crystals",20,"starps",1,8],["🌌 Star Forge","crystals",120,"starps",4,9],["🌠 Galaxy Core","crystals",800,"power",2000,10],["🌠 Universe Engine","crystals",8000,"starps",80,12],["🌌 Star Booster","crystals",40000,"power",20000,15],
+["👑 Reality Breaker","stars",100,"mul",10,20],["♾️ Infinite Tap","stars",800,"mul",25,25],["🌠 Multiverse Machine","stars",8000,"cps",80000,30],["🪐 Omniverse Core","stars",80000,"power",800000,40]
+ ];
+
+const DOLLAR_UPGRADE_NAMES=[
+"💵 Pocket Cash","🏧 Cash Printer","💰 Golden Bill","🏦 Money Factory","⚡ Cash Accelerator","💳 Double Deposit","🧲 Money Magnet","🏗️ Mega Bank","🚀 Cash Rocket","🌟 Golden Vault","💥 Money Blast","⚙️ Hyper Bank","🌋 Money Mountain","🏛️ Billionaire Bank","☄️ Cash Meteor","🌌 Money Press","🌀 Reality Wallet","👑 Royal Treasury","♾️ Infinite Vault","🌠 Multiverse Mint",
+"💎 Diamond Deposit","💵 Cash Booster","💰 Money Mine","💳 Cash Multiplier","💎 Diamond Vault","🏦 Mega Reserve","🔮 Crystal Cash Mine","🔮 Crystal Drill Bank","🔮 Crystal Reserve","🔮 Crystal Multiplier","🔮 Crystal Factory","🌌 Star Treasury","🌌 Star Forge Bank","🌠 Galaxy Vault","🌠 Universe Bank","🌌 Star Reserve","👑 Reality Treasury","♾️ Infinite Fortune","🌠 Multiverse Bank","🪐 Omniverse Treasury"
+];
+
+function worldIs2(){return s.world===2}
+function activePetMultiplier(){return worldIs2()?s.dollarPet:s.pet}
+function worldCurrency(){return worldIs2()?s.world2.dollars:s.coins}
+function worldPower(){return worldIs2()?s.world2.power:s.power}
+function worldCps(){return worldIs2()?s.world2.cps:s.cps}
+function worldCounts(){
+  if(worldIs2()){
+    if(!s.world2||typeof s.world2!=="object")s.world2={dollars:0n,power:1n,cps:0n,upgradeCounts:[]};
+    if(!Array.isArray(s.world2.upgradeCounts))s.world2.upgradeCounts=[];
+    return s.world2.upgradeCounts;
+  }
+  if(!Array.isArray(s.upgradeCounts))s.upgradeCounts=[];
+  return s.upgradeCounts;
+}
+function setWorldCurrency(v){if(worldIs2())s.world2.dollars=v;else s.coins=v}
+function setWorldPower(v){if(worldIs2())s.world2.power=v;else s.power=v}
+function setWorldCps(v){if(worldIs2())s.world2.cps=v;else s.cps=v}
+
+// Dollar World is intentionally slower: upgrades and passive income are weaker.
+function dollarAmount(v){
+  if(!worldIs2())return v;
+  const n=BigInt(v);
+  if(n<=0n)return 0n;
+  const reduced=n*35n/100n;
+  return reduced>0n?reduced:1n;
+}
+function dollarMultiplier(uValue){
+  if(!worldIs2())return {num:BigInt(uValue),den:1n};
+  const map={2:[5n,4n],3:[7n,5n],10:[2n,1n],25:[3n,1n]};
+  return map[uValue]||[3n,2n];
+}
+function applyUpgradeEffect(u){
+  if(u[3]==="mul"){
+    const [num,den]=dollarMultiplier(u[4]);
+    let next=worldPower()*num/den;
+    if(next<=worldPower())next=worldPower()+1n;
+    setWorldPower(next);
+  }else if(u[3]==="power"){
+    setWorldPower(worldPower()+dollarAmount(u[4]));
+  }else if(u[3]==="cps"){
+    setWorldCps(worldCps()+dollarAmount(u[4]));
+  }else if(BIG_KEYS.includes(u[3])){
+    s[u[3]]+=BigInt(u[4]);
+  }
+}
+let costs=[];
+
+function getUpgradeCost(i){
+  const u=U[i];
+  if(!u)return 0n;
+  const counts=worldCounts();
+  let c=BigInt(u[2]);
+  if(worldIs2())c*=10n;
+  const owned=Math.max(0,Number(counts[i]||0));
+  for(let n=0;n<owned;n++) c=worldIs2()?c*125n/100n+1n:c*128n/100n+1n;
+  return c;
+}
+
+function rebuildCosts(){ costs=U.map((_,i)=>getUpgradeCost(i)); }
+
+// Format: [Icon, Name, Price (BigInt String or Number), Multiplier]
+const P=[
+  // Tier 1: Starter Pets (Thousands to Millions)
+  ["🐶","Coin Pup", "5000", 1.25],
+  ["🐱","Gem Cat", "25000", 1.4],
+  ["🐹","Golden Hamster", "100000", 1.6],
+  ["🐰","Lucky Bunny", "500000", 1.8],
+  ["🦊","Fox of Fortune", "2500000", 2.1],
+  ["🦝","Bandit Raccoon", "10000000", 2.5],
+
+  // Tier 2: Elemental & Rare Pets (Tens of Millions to Billions)
+  ["🐲","Fire Dragon", "50000000", 3.0],
+  ["🦉","Wise Owl", "250000000", 3.8],
+  ["🐺","Shadow Wolf", "1000000000", 4.8],
+  ["🦄","Cosmic Unicorn", "5000000000", 6.0],
+  ["🦚","Prismatic Peacock", "25000000000", 8.0],
+  ["🐯","Golden Tiger", "100000000000", 10.5],
+
+  // Tier 3: Ancient & Legendary Pets (Trillions)
+  ["🐉","Galaxy Dragon", "500000000000", 14.0],
+  ["🦅","Star Eagle", "2500000000000", 18.0],
+  ["🐙","Void Octopus", "10000000000000", 24.0],
+  ["🔥","Inferno Phoenix", "50000000000000", 32.0],
+  ["👾","Mega Alien", "250000000000000", 42.0],
+  ["🦁","Imperial Lion", "1000000000000000", 55.0],
+
+  // Tier 4: Mythic & Stellar Guardians (Quadrillions)
+  ["🌌","Universe Spirit", "5000000000000000", 75.0],
+  ["🦖","Titan Rex", "25000000000000000", 100.0],
+  ["🦈","Abyss Shark", "100000000000000000", 140.0],
+  ["🐋","Cosmic Whale", "500000000000000000", 190.0],
+  ["🦋","Nebula Butterfly", "2500000000000000000", 260.0],
+  ["🦍","Hyper Gorilla", "10000000000000000000", 350.0],
+
+  // Tier 5: Celestial & Primordial Entities (Quintillions to Sextillions)
+  ["🦄","Rainbow Unicorn", "50000000000000000000", 480.0],
+  ["🐉","Ancient Serpent", "250000000000000000000", 650.0],
+  ["🤖","Omega Mech", "1000000000000000000000", 900.0],
+  ["🌟","Celestial Guardian", "5000000000000000000000", 1250.0],
+  ["👁️","All-Seeing Eye", "25000000000000000000000", 1750.0],
+  ["☄️","Comet Hound", "100000000000000000000000", 2400.0],
+
+  // Tier 6: Multiversal Entities (Septillions)
+  ["🧿","Aether Orb", "500000000000000000000000", 3200.0],
+  ["👑","Crown Archon", "2500000000000000000000000", 4500.0],
+  ["🕳️","Singularity Core", "10000000000000000000000000", 6200.0],
+  ["⚜️","Solar Monarch", "50000000000000000000000000", 8500.0],
+  ["⚖️","Cosmic Balance", "250000000000000000000000000", 12000.0],
+  ["🔮","Omniscient Oracle", "1000000000000000000000000000", 16500.0],
+
+  // Tier 7: Infinite Dimensions & Primordials (Octillions to Nonillions)
+  ["✨","Starlight Entity", "5000000000000000000000000000", 23000.0],
+  ["⚡","Hyperion God", "25000000000000000000000000000", 32000.0],
+  ["🪐","Chronos Titan", "100000000000000000000000000000", 45000.0],
+  ["🔱","Neptune Primordial", "500000000000000000000000000000", 62000.0],
+  ["🧬","Genesis Weaver", "2500000000000000000000000000000", 88000.0],
+  ["♾️","Infinite Deity", "10000000000000000000000000000000", 125000.0],
+
+  // 🌮 Limited-time Space Taco — available for 7 days from the first launch of this version
+  ["🌮🚀","SPACE TACO (LIMITED)", "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000", 10000000.0]
+];
+
+recalculatePetMultiplier();
+
+// 💵 Dollar World-exclusive pets. These are separate from Coin World pets.
+const DOLLAR_PETS=[
+  ["🐭","Money Mouse","250",1.25],
+  ["🐱","Cash Cat","2500",1.6],
+  ["🐶","Bank Dog","25000",2.1],
+  ["🦆","Diamond Duck","250000",3.0],
+  ["🐒","Millionaire Monkey","2500000",4.5],
+  ["🐰","Billionaire Bunny","25000000",7.0],
+  ["🦊","Cash Fox","250000000",10.0],
+  ["🐼","Money Panda","2500000000",14.0],
+  ["🦁","Vault Lion","25000000000",20.0],
+  ["🐯","Gold Tiger","250000000000",30.0],
+  ["🐲","Money Dragon","2500000000000",45.0],
+  ["🦄","Fortune Unicorn","25000000000000",70.0],
+  ["🦅","Million-Dollar Eagle","250000000000000",100.0],
+  ["🐋","Cash Whale","2500000000000000",150.0],
+  ["👽","Alien Investor","25000000000000000",225.0],
+  ["🤖","Money Machine","250000000000000000",350.0],
+  ["🌌","Cosmic Cash Beast","2500000000000000000",550.0],
+  ["👑","Money King","25000000000000000000",850.0],
+  ["💎","Diamond Billionaire","250000000000000000000",1250.0],
+  ["🏦","Ultimate Bank Boss","2500000000000000000000",2000.0]
+];
+function recalculateDollarPetMultiplier(){
+  if(!s.dollarOwnedPets || s.dollarOwnedPets.length===0){s.dollarPet=1;return;}
+  let maxMult=1;
+  for(const i of s.dollarOwnedPets){
+    if(DOLLAR_PETS[i] && DOLLAR_PETS[i][3]>maxMult)maxMult=DOLLAR_PETS[i][3];
+  }
+  s.dollarPet=maxMult;
+}
+recalculateDollarPetMultiplier();
+
+function loadGame(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY)||(!IS_GITHUB?null:localStorage.getItem("megaClickerSave"));
+    const saved=raw?JSON.parse(raw):null;
+    if(saved){
+      const loaded=Object.assign({},defaultState,saved);
+      BIG_KEYS.forEach(k=>{try{loaded[k]=BigInt(saved[k]??defaultState[k]??0)}catch(e){loaded[k]=BigInt(defaultState[k]??0)}});
+      loaded.world2=Object.assign({},defaultState.world2,saved.world2||{});
+      try{loaded.world2.dollars=BigInt(saved.world2?.dollars??defaultState.world2.dollars)}catch(e){loaded.world2.dollars=0n}
+      try{loaded.world2.power=BigInt(saved.world2?.power??defaultState.world2.power)}catch(e){loaded.world2.power=1n}
+      try{loaded.world2.cps=BigInt(saved.world2?.cps??defaultState.world2.cps)}catch(e){loaded.world2.cps=0n}
+      if(!Array.isArray(loaded.upgradeCounts))loaded.upgradeCounts=[];
+      if(!Array.isArray(loaded.world2.upgradeCounts))loaded.world2.upgradeCounts=[];
+      return loaded;
+    }
+  }catch(e){}
+  return JSON.parse(JSON.stringify(defaultState));
+}
+function saveGame(){try{const copy={...s,world2:{...s.world2}};BIG_KEYS.forEach(k=>copy[k]=s[k].toString());copy.world2.dollars=s.world2.dollars.toString();copy.world2.power=s.world2.power.toString();copy.world2.cps=s.world2.cps.toString();localStorage.setItem(SAVE_KEY,JSON.stringify(copy));document.getElementById("saveStatus").textContent="💾 Progress saved!";setTimeout(()=>document.getElementById("saveStatus").textContent="💾 Auto-save on",900)}catch(e){document.getElementById("saveStatus").textContent="⚠️ Save unavailable in this browser"}}
+function fullNumber(n){if(typeof n==="bigint")return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");return Math.floor(Number(n)||0).toLocaleString()}
+function f(n){const value=typeof n==="bigint"?n:BigInt(String(Math.floor(Number(n)||0)));const negative=value<0n;const abs=negative?-value:value;const units=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc","Ud","Dd","QaD","QiD"];let group=0,scaled=abs;while(scaled>=1000n&&group<units.length-1){scaled/=1000n;group++}if(group===0)return(negative?"-":"")+scaled.toString();const divisor=1000n**BigInt(group),whole=abs/divisor,remainder=abs%divisor;let decimals="";if(remainder!==0n){const hundredths=(remainder*100n)/divisor,tenth=hundredths/10n,hundred=hundredths%10n;decimals=hundred?`.${tenth}${hundred}`:`.${tenth}`}return(negative?"-":"")+whole.toString()+decimals+units[group]}
+function setCompact(id,value){const el=document.getElementById(id);if(!el)return;el.textContent=f(value);el.title=fullNumber(value);el.classList.add("compactNumber")}
+function addXP(n){const oldLevel=s.level;s.xp+=n;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}if(s.level!==oldLevel&&applyMilestoneRewards())saveGame()}
+function rare(){let r=Math.random();if(r<.002&&s.level>=30)return["cosmic",1000,"🌌 COSMIC CLICK!"];if(r<.01&&s.level>=20)return["space",50,"🚀 SPACE CLICK!"];if(r<.04&&s.level>=10)return["gold",15,"🥇 GOLD CLICK!"];if(r<.1&&s.level>=5)return["silver",5,"🥈 SILVER CLICK!"];if(r<.22)return["bronze",2,"🥉 BRONZE CLICK!"];return["normal",1,"Normal Click!"]}
+function bad(b,t){if(!b)return;b.classList.remove("bad");void b.offsetWidth;b.classList.add("bad");document.getElementById("msg").textContent="❌ "+t;setTimeout(()=>b.classList.remove("bad"),650)}
+
+function render(){
+const ids=["clicks","normal","bronze","silver","gold","space","cosmic","level","xp"];ids.forEach(k=>{if(k in s)setCompact(k,s[k]??0)});setCompact("coins",worldCurrency());setCompact("power",worldPower());setCompact("cps",worldCps());setCompact("gems",s.gems);setCompact("crystals",s.crystals);setCompact("stars",s.stars);setCompact("next",BigInt(Number(s.level||1)*100));setCompact("rebirths",s.rebirths||0);
+document.getElementById("shop").innerHTML=U.map((u,i)=>{const counts=worldCounts(),count=Number(counts[i]||0),req=Number(u[5]||0),locked=s.rebirths<req,displayName=worldIs2()?DOLLAR_UPGRADE_NAMES[i]:u[0],price=getUpgradeCost(i),currencyName=getUpgradeCurrencyName(u),lockText=locked?`<span class="lockText">🔒 Requires ${req} rebirth${req===1?"":"s"}</span>`:`<span class="muted">Next cost: ${f(price)} ${currencyName}</span>`;return `<div class="item ${locked?"lockedUpgrade":""}"><span>${displayName}<br><strong style="font-size:16px;">Owned: ${count}</strong><br>${lockText}${s.lastPurchase.includes(displayName)?`<br><strong style="color:#22c55e;">✅ PURCHASE CONFIRMED</strong>`:""}</span><span><button type="button" ${locked?"disabled":""} onclick="${worldIs2()?`buy(${i})`:`coinWorldBuy(${i})`};return false;">${locked?"🔒 LOCKED":"BUY"}</button><button type="button" ${locked?"disabled":""} onclick="${worldIs2()?`buyMax(${i})`:`coinWorldBuyMax(${i})`};return false;">${locked?"🔒 LOCKED":"MAX"}</button></span></div>`}).join("");
+
+const spaceTacoIndex=P.length-1;
+const spaceTacoActive=Date.now()-s.spaceTacoStart<7*24*60*60*1000;
+const visiblePets=spaceTacoActive?P:P.slice(0,-1);
+const petSectionTitle=worldIs2()?`💵 Dollar Pets (<span id="petCount">${s.dollarOwnedPets.length}</span>/<span id="petTotal">${DOLLAR_PETS.length}</span>)`:`🐾 Pets (<span id="petCount">${s.ownedPets.filter(i=>i<visiblePets.length).length}</span>/<span id="petTotal">${visiblePets.length}</span>)`;
+const petSection=document.querySelector("#petSection h2");
+if(petSection)petSection.innerHTML=petSectionTitle;
+const purchaseNotice=document.getElementById("purchaseNotice");if(purchaseNotice)purchaseNotice.textContent=s.lastPurchase||"No upgrades purchased yet.";
+const petHelp=document.getElementById("petHelp");if(petHelp)petHelp.textContent=worldIs2()?"💵 Dollar World-exclusive pets! They only work in Dollar World and are separate from Coin World pets.":"Pets stay with you FOREVER, even after Rebirths! Highest owned pet multiplier automatically active!";
+const petList=worldIs2()?DOLLAR_PETS:visiblePets;
+const ownedList=worldIs2()?s.dollarOwnedPets:s.ownedPets;
+document.getElementById("petCount").textContent=ownedList.length;
+document.getElementById("petTotal").textContent=petList.length;
+document.getElementById("pets").innerHTML=petList.map((p,i)=>{
+  const owned=ownedList.includes(i);
+  const costBig=BigInt(p[2]);
+  return `<div class="pet ${owned?"owned":""}">
+    <div class="petIcon">${p[0]}</div>
+    <b>${p[1]}</b>
+    <div>💵 ${f(costBig)}</div>
+    <div style="color:#60a5fa;font-weight:bold;margin:2px 0;">x${p[3]} Boost</div>
+    <button data-p="${i}" ${owned?"disabled":""}>${owned?"OWNED":"GET PET"}</button>
+  </div>`
+}).join("");
+document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>pet(+b.dataset.p));updateRebirthUI();updateAdminUI();updateWorldUI();applyCoinColor();applyCoinPosition()
+}
+
+function getUpgradeCurrencyName(u){
+  if(worldIs2())return "dollars";
+  if(u[1]==="coins")return "coins";
+  if(u[1]==="gems")return "gems";
+  if(u[1]==="crystals")return "crystals";
+  if(u[1]==="stars")return "stars";
+  return u[1]||"coins";
+}
+function getUpgradeCurrency(u){
+  if(worldIs2())return s.world2.dollars;
+  if(u[1]==="coins")return s.coins;
+  if(u[1]==="gems")return s.gems;
+  if(u[1]==="crystals")return s.crystals;
+  if(u[1]==="stars")return s.stars;
+  return s.coins;
+}
+function setUpgradeCurrency(u,v){
+  if(worldIs2()){s.world2.dollars=v;return;}
+  if(u[1]==="coins")s.coins=v;
+  else if(u[1]==="gems")s.gems=v;
+  else if(u[1]==="crystals")s.crystals=v;
+  else if(u[1]==="stars")s.stars=v;
+  else s.coins=v;
+}
+function isUnlocked(i){return !!U[i]&&s.rebirths>=Number(U[i][5]||0)}
+function canAfford(i){
+  const u=U[i];
+  return !!u&&isUnlocked(i)&&getUpgradeCurrency(u)>=getUpgradeCost(i);
+}
+function buyOne(i){
+  const u=U[i]; if(!u||!isUnlocked(i))return false;
+  const price=getUpgradeCost(i),currency=getUpgradeCurrency(u);
+  if(currency<price)return false;
+  setUpgradeCurrency(u,currency-price);
+  applyUpgradeEffect(u);
+  const counts=worldCounts();
+  counts[i]=Math.max(0,Number(counts[i]||0))+1;
+  costs[i]=getUpgradeCost(i);
+  try{playSound("buy")}catch(e){}
+  try{showUpgradeOnCoin(worldIs2()?DOLLAR_UPGRADE_NAMES[i]:u[0])}catch(e){}
+  return true;
+}
+function coinWorldCurrencyFor(u){
+  if(u[1]==="coins")return s.coins;
+  if(u[1]==="gems")return s.gems;
+  if(u[1]==="crystals")return s.crystals;
+  if(u[1]==="stars")return s.stars;
+  return 0n;
+}
+function coinWorldSetCurrencyFor(u,v){
+  if(u[1]==="coins")s.coins=v;
+  else if(u[1]==="gems")s.gems=v;
+  else if(u[1]==="crystals")s.crystals=v;
+  else if(u[1]==="stars")s.stars=v;
+}
+function coinWorldBuy(i){
+  const u=U[i];
+  const buttons=document.querySelectorAll("#shop .item")[i]?.querySelectorAll("button");
+  const b=buttons&&buttons[0];
+  if(worldIs2())return buy(i);
+  if(!u)return;
+  const req=Number(u[5]||0);
+  if(s.rebirths<req)return bad(b,"Requires "+req+" rebirth"+(req===1?"":"s")+"!");
+  const price=getUpgradeCost(i);
+  const currency=coinWorldCurrencyFor(u);
+  if(currency<price)return bad(b,"Not enough "+u[1]+"! Need "+f(price)+".");
+  coinWorldSetCurrencyFor(u,currency-price);
+  applyUpgradeEffect(u);
+  const counts=worldCounts();
+  counts[i]=Math.max(0,Number(counts[i]||0))+1;
+  rebuildCosts();
+  try{playSound("buy")}catch(e){}
+  try{showUpgradeOnCoin(u[0])}catch(e){}
+  s.lastPurchase="✅ BOUGHT: "+u[0]+" | Owned: "+counts[i]+" | Paid: "+f(price)+" "+u[1]+" | Remaining: "+f(coinWorldCurrencyFor(u))+" "+u[1];
+  saveGame();
+  render();
+}
+function coinWorldBuyMax(i){
+  if(worldIs2())return buyMax(i);
+  const u=U[i];
+  if(!u)return;
+  const items=document.querySelectorAll("#shop .item");
+  const b=items[i]?.querySelectorAll("button")[1];
+  const req=Number(u[5]||0);
+  if(s.rebirths<req)return bad(b,"Requires "+req+" rebirth"+(req===1?"":"s")+"!");
+  let bought=0;
+  while(bought<10000){
+    const price=getUpgradeCost(i),currency=coinWorldCurrencyFor(u);
+    if(currency<price)break;
+    coinWorldSetCurrencyFor(u,currency-price);
+    applyUpgradeEffect(u);
+    const counts=worldCounts();
+    counts[i]=Math.max(0,Number(counts[i]||0))+1;
+    bought++;
+  }
+  if(!bought)return bad(b,"Not enough "+u[1]+"! Need "+f(getUpgradeCost(i))+".");
+  rebuildCosts();
+  s.lastPurchase="✅ BOUGHT "+bought+"x: "+u[0]+" | Owned: "+Number(worldCounts()[i]||0)+" | Remaining: "+f(coinWorldCurrencyFor(u))+" "+u[1];
+  saveGame();
+  render();
+  document.getElementById("msg").textContent=s.lastPurchase;
+}
+
+function buy(i){
+  const b=document.querySelector(`#shop .item:nth-child(${i+1}) button`);
+  const u=U[i];
+  if(!u)return;
+  if(!isUnlocked(i))return bad(b,"Requires "+Number(u[5]||0)+" rebirths!");
+  const price=getUpgradeCost(i),currency=getUpgradeCurrency(u);
+  if(currency<price)return bad(b,"Not enough "+getUpgradeCurrencyName(u)+"! Need "+f(price)+".");
+  if(!buyOne(i))return bad(b,"Purchase failed — please try again.");
+  document.getElementById("msg").textContent="🚀 Upgrade purchased! Owned: "+Number(worldCounts()[i]||0)+" — next cost: "+f(getUpgradeCost(i))+" "+getUpgradeCurrencyName(u)+".";
+  saveGame();render();
+}
+function buyMax(i){
+  const b=document.querySelector(`#shop .item:nth-child(${i+1}) button:nth-of-type(2)`),u=U[i];
+  if(!u)return;
+  if(!isUnlocked(i))return bad(b,"Requires "+Number(u[5]||0)+" rebirths!");
+  let bought=0;
+  while(bought<10000&&canAfford(i)){if(!buyOne(i))break;bought++;}
+  if(bought===0)return bad(b,"Not enough "+getUpgradeCurrencyName(u)+"! Need "+f(getUpgradeCost(i))+".");
+  document.getElementById("msg").textContent="🚀 Bought "+bought+" upgrade"+(bought===1?"":"s")+"!";
+  saveGame();render();
+}
+
+function pet(i){
+  if(worldIs2()){
+    const p=DOLLAR_PETS[i],b=document.querySelector(`[data-p="${i}"]`);
+    if(!p || s.dollarOwnedPets.includes(i))return;
+    const priceBig=BigInt(p[2]);
+    if(worldCurrency()<priceBig)return bad(b,"Not enough dollars!");
+    setWorldCurrency(worldCurrency()-priceBig);
+    s.dollarOwnedPets.push(i);
+    recalculateDollarPetMultiplier();
+  }else{
+    if(i===P.length-1 && Date.now()-s.spaceTacoStart>=7*24*60*60*1000)return;
+    const p=P[i],b=document.querySelector(`[data-p="${i}"]`);
+    if(!p || s.ownedPets.includes(i))return;
+    const priceBig=BigInt(p[2]);
+    if(worldCurrency()<priceBig)return bad(b,"Not enough coins!");
+    setWorldCurrency(worldCurrency()-priceBig);
+    s.ownedPets.push(i);
+    recalculatePetMultiplier();
+  }
+  playSound("buy");saveGame();render();
+}
+function showUpgradeOnCoin(icon){const holder=document.getElementById("upgradePop");if(!holder)return;const p=document.createElement("div");p.className="coinUpgrade";p.textContent=icon;holder.appendChild(p);setTimeout(()=>p.remove(),1250)}
+
+function tap(e,silent=false){
+  let[k,m,msg]=rare();
+  const petScaled=BigInt(Math.round(activePetMultiplier()*100)), weatherMult=BigInt(weather.mult), rebirthMultiplier=getRebirthMultiplierNum();
+  let mondayMultiplier=isExtraPowerMonday()?3n:1n;
+  
+  let g=(worldPower()*BigInt(m)*petScaled*weatherMult*rebirthMultiplier*mondayMultiplier)/10000n;
+  if(g<1n)g=1n;
+  
+  setWorldCurrency(worldCurrency()+g);s.clicks++;s[k]++;
+  const xpGain=g>2000000000n?2000000000:Number(g/2n);addXP(Math.max(1,xpGain));
+  const c=document.getElementById("coin");
+  c.classList.remove("pop","bronzeGlow","silverGlow","goldGlow","spaceGlow","cosmicGlow");
+  if(m>1){const glow={2:"bronzeGlow",5:"silverGlow",15:"goldGlow",50:"spaceGlow",1000:"cosmicGlow"}[m];if(glow)c.classList.add(glow)}
+  else if(weather.mult>1){const wg=weather.mult>=25?"cosmicGlow":weather.mult>=10?"spaceGlow":weather.mult>=5?"goldGlow":weather.mult>=3?"silverGlow":"bronzeGlow";c.classList.add(wg)}
+  void c.offsetWidth;c.classList.add("pop");
+  setTimeout(()=>c.classList.remove("bronzeGlow","silverGlow","goldGlow","spaceGlow","cosmicGlow"),900);
+  if(weather.mult>1)msg=weather.icon+" "+weather.name+" x"+weather.mult+"!";
+  document.getElementById("msg").textContent=msg+" +"+f(g)+" "+(worldIs2()?"💵":"🪙");
+  const q=document.createElement("span");q.className="float";q.textContent="+"+f(g)+" "+(worldIs2()?"💵":"🪙");
+  q.style.left=(e?.clientX||window.innerWidth/2)+"px";
+  q.style.top=(e?.clientY||200)+"px";
+  document.body.appendChild(q);
+  setTimeout(()=>q.remove(),850);
+  try{render()}catch(err){console.warn("Render error:",err)}
+  try{if(!silent)playSound(k==="cosmic"||k==="space"?"rare":"click")}catch(err){}
+}
+
+document.getElementById("coin").addEventListener("click",tap);
+
+// Anti-spam key listener: Only single initial presses trigger clicks
+document.addEventListener("keydown",e=>{
+  if(["INPUT","TEXTAREA","BUTTON"].includes(document.activeElement.tagName))return;
+  if(e.code!=="Space"&&!e.key.startsWith("Arrow"))return;
+  // Coin World: holding is blocked; exactly one click per press.
+  // Dollar World: browser key-repeat is intentionally allowed, so holding clicks repeatedly.
+  if(e.repeat && !worldIs2())return;
+  e.preventDefault();
+  tap();
+});
+
+setInterval(()=>{
+  const petScaled=BigInt(Math.round(activePetMultiplier()*100)), rebirthMultiplier=getRebirthMultiplierNum();
+  let passive=(worldCps()*petScaled*rebirthMultiplier)/10000n;setWorldCurrency(worldCurrency()+passive);
+  if(s.level>=5)s.gems+=s.gps;
+  if(s.level>=15)s.crystals+=s.crystalps;
+  if(s.level>=30)s.stars+=s.starps;
+  const xpGain=worldCps()>4000000000n?2000000000:Number(worldCps()/2n);
+  addXP(Math.floor(xpGain));
+  render();
+},1000);
+
+// Admin auto clicker: 10 clicks per second, much faster than the normal game tick.
+setInterval(()=>{if(s.autoClicker)tap(undefined,true)},100);
+
+setInterval(saveGame,5000);
+
+const REBIRTH_COLORS=[["#ffe066","#d99a00","#fff1a8"],["#ff7b7b","#c51f3a","#ffd1d1"],["#7c9cff","#3b4cca","#cbd5ff"],["#65e6b3","#168f68","#c7ffe9"],["#c084fc","#6d28d9","#ead7ff"],["#f59e0b","#b45309","#ffedb5"],["#22d3ee","#0e7490","#bff7ff"],["#f472b6","#be185d","#ffd0e8"],["#a3e635","#4d7c0f","#e5ffbd"],["#fb923c","#c2410c","#ffe0c2"]];
+function applyCoinColor(){const c=document.getElementById("coin");if(!c)return;if(worldIs2()){c.style.background="linear-gradient(145deg,#86efac,#16a34a)";c.style.borderColor="#dcfce7";c.style.boxShadow=`0 8px 25px #0008,0 0 ${Math.min(75,25+s.rebirths*4)}px #4ade8066`;c.title="Dollar World money";return}const pal=REBIRTH_COLORS[s.rebirths%REBIRTH_COLORS.length];c.style.background=`linear-gradient(145deg,${pal[0]},${pal[1]})`;c.style.borderColor=pal[2];c.style.boxShadow=`0 8px 25px #0008,0 0 ${Math.min(60,15+s.rebirths*4)}px ${pal[0]}55`;c.title=s.rebirths?`Rebirth ${s.rebirths} coin`:"Original coin"}
+function applyCoinPosition(){const c=document.getElementById("coin"),w=document.querySelector(".coinWrap");if(w){w.style.transform=`translate(${s.coinOffsetX}px,${s.coinOffsetY}px)`}}
+
+function updateRebirthUI(){
+  const btn=document.getElementById("rebirthBtn"),info=document.getElementById("rebirthInfo");
+  if(!btn||!info)return;
+  const cost=getRebirthCost();
+  const ready=worldCurrency()>=cost;
+  btn.disabled=!ready;
+  btn.textContent=ready?"♻️ REBIRTH NOW":"♻️ REBIRTH";
+  info.textContent=ready?`Ready! Rebirth ${s.rebirths+1} costs ${f(cost)} ${worldIs2()?"dollars":"coins"} and resets the current world and multiplier to ×1. (Pets are KEPT!)`:
+  `Next rebirth (${s.rebirths+1}) costs ${f(cost)} ${worldIs2()?"dollars":"coins"}. You have ${f(worldCurrency())}.`;
+}
+
+function updateAdminUI(){const btn=document.getElementById("adminBtn");if(!btn)return;if(s.adminUnlocked||s.rebirths>=250){s.adminUnlocked=true;btn.classList.add("unlocked");btn.textContent="👑 ADMIN ✓"}else{btn.classList.remove("unlocked");btn.textContent="👑 ADMIN"}}
+function renderHall(){const h=document.getElementById("adminHall");if(!h)return;h.innerHTML=s.adminHall.length?s.adminHall.map((x,i)=>`<div>🏆 ${i+1}. ${escapeHtml(x)}</div>`).join(""):"Nobody has been added yet."}
+function escapeHtml(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function openAdminNote(){const note=document.getElementById("adminNote"),text=document.getElementById("adminNoteText"),panel=document.getElementById("adminPanel"),lockedClose=document.getElementById("adminLockedClose");if(s.adminUnlocked||s.rebirths>=250){s.adminUnlocked=true;text.innerHTML='<span class="adminUnlocked">🎉 Admin unlocked!</span>';panel.style.display="block";lockedClose.style.display="none";renderHall();updateAutoButton();}else{text.textContent="🔒 You need 250 rebirths to unlock Admin!";panel.style.display="none";lockedClose.style.display="block"}note.classList.add("show");saveGame()}
+function closeAdminNote(){document.getElementById("adminNote").classList.remove("show")}
+document.getElementById("adminBtn").onclick=openAdminNote;
+function adminMsg(t){document.getElementById("adminStatus").textContent=t;saveGame();render()}
+function adminX100Clicks(){if(!s.adminUnlocked)return;for(let i=0;i<100;i++){const [k,m]=rare();const petScaled=BigInt(Math.round(activePetMultiplier()*100)),weatherMult=BigInt(weather.mult),rebirthMultiplier=getRebirthMultiplierNum();let mondayMultiplier=isExtraPowerMonday()?3n:1n;let g=(worldPower()*BigInt(m)*petScaled*weatherMult*rebirthMultiplier*mondayMultiplier)/10000n;if(g<1n)g=1n;setWorldCurrency(worldCurrency()+g);s.clicks++;s[k]++;}adminMsg("🖱️ Added 100 clicks!")}
+function adminMillionPower(){setWorldPower(worldPower()*1000000n);adminMsg("⚡ Click power ×1,000,000!")}
+function adminExplode(){const c=document.getElementById("coin");c.animate([{transform:"scale(1)"},{transform:"scale(1.7) rotate(12deg)"},{transform:"scale(.1) rotate(720deg)",opacity:.2},{transform:"scale(1)",opacity:1}],{duration:850,easing:"ease-out"});for(let i=0;i<35;i++){const p=document.createElement("span");p.className="float";p.textContent=["💥","🪙","✨"][i%3];p.style.left=(window.innerWidth/2+(Math.random()-.5)*220)+"px";p.style.top=(220+(Math.random()-.5)*160)+"px";document.body.appendChild(p);setTimeout(()=>p.remove(),900)}adminMsg("💥 BOOM! Coin exploded!")}
+function adminMoveCoin(){s.coinOffsetX=Math.round((Math.random()-.5)*500);s.coinOffsetY=Math.round((Math.random()-.5)*300);adminMsg("🌀 Coin moved!");}
+function adminAddHall(){if(!s.adminUnlocked)return;let name=prompt("Enter the name to add to the 250 Rebirth Hall of Fame:","JAX");if(name&&name.trim()){const clean=name.trim().slice(0,30);if(!s.adminHall.includes(clean))s.adminHall.push(clean);renderHall();adminMsg("🏆 "+clean+" was added to the list!");}}
+function adminToggleAuto(){s.autoClicker=!s.autoClicker;updateAutoButton();adminMsg("🤖 Auto Clicker "+(s.autoClicker?"ON":"OFF")+"!")}
+function updateAutoButton(){const b=document.querySelector(".adminCmd button[onclick=\"adminToggleAuto()\"]");if(b)b.textContent="🤖 Auto Clicker: "+(s.autoClicker?"ON":"OFF")}
+function adminAllUpgrades(){if(!s.adminUnlocked)return;U.forEach((u,i)=>{const count=100;const counts=worldCounts();counts[i]=(counts[i]||0)+count;if(u[3]==="mul")for(let n=0;n<count;n++)setWorldPower(worldPower()*BigInt(u[4]));else if(u[3]==="power")setWorldPower(worldPower()+BigInt(u[4])*BigInt(count));else if(u[3]==="cps")setWorldCps(worldCps()+BigInt(u[4])*BigInt(count));else s[u[3]]+=BigInt(u[4])*BigInt(count);});rebuildCosts();adminMsg("🎁 All upgrades given!")}
+function adminBillionCoins(){setWorldCurrency(worldCurrency()*10000000000n);adminMsg("💰 Coins multiplied by 10,000,000,000!")}
+
+function updateWorldUI(){
+  const btn=document.getElementById("worldBtn"),notice=document.getElementById("worldNotice"),icon=document.getElementById("currencyIcon"),label=document.getElementById("currencyLabel"),coin=document.getElementById("coin");
+  if(!btn||!notice)return;
+  const unlocked=s.coinRebirths>=100;
+  if(worldIs2()&&!unlocked){s.world=1;rebuildCosts();return updateWorldUI()}
+  btn.classList.toggle("locked",!unlocked);btn.classList.toggle("active",worldIs2());
+  btn.textContent=worldIs2()?"🪙 World 1: SWITCH":"💵 Dollar World: "+(unlocked?"ENTER":"LOCKED");
+  notice.innerHTML=worldIs2()?"💵 <b>Dollar World</b> • Money everywhere! A brand-new green world with its own dollar upgrades and progress. • <b>100 rebirths</b> required to enter.":"🌎 <b>Coin World</b> • Reach <b>100 rebirths</b> to unlock Dollar World!";
+  icon.textContent=worldIs2()?"💵":"🪙";label.textContent=worldIs2()?" dollars":" coins";
+  if(coin)coin.textContent=worldIs2()?"💵":"🪙";document.getElementById("gameTitle").textContent=worldIs2()?"💵 DOLLAR WORLD":"🪙 COIN CLICKER";
+  document.getElementById("powerLabel").textContent=worldIs2()?"Dollar Power":"Power";document.body.classList.toggle("world2",worldIs2());
+}
+function switchWorld(){
+  if(!worldIs2() && s.coinRebirths<100)return bad(document.getElementById("worldBtn"),"Reach 100 Coin World rebirths to unlock Dollar World!");
+
+  if(!worldIs2()){
+    // ENTER DOLLAR WORLD: preserve all existing Dollar World progress.
+    // Only the first-ever entry creates the fresh Dollar World save.
+    s.coinRebirths=s.rebirths;
+    s.coinRebirthMultiplier=s.rebirthMultiplier||1;
+    s.dollarRebirths=Number.isInteger(s.dollarRebirths)?s.dollarRebirths:0;
+    s.dollarRebirthMultiplier=Number.isFinite(Number(s.dollarRebirthMultiplier))?Number(s.dollarRebirthMultiplier):1;
+
+    if(!s.dollarWorldStarted){
+      s.dollarRebirths=0;
+      s.dollarRebirthMultiplier=1;
+      s.world2={dollars:0n,power:1n,cps:0n,upgradeCounts:[]};
+      s.dollarWorldStarted=true;
+    }
+
+    s.rebirths=s.dollarRebirths;
+    s.rebirthMultiplier=s.dollarRebirthMultiplier;
+    s.xp=0;
+    s.level=1;
+    s.world=2;
+    s.autoClicker=false;
+    secondAdminClose();
+    rebuildCosts();
+    document.getElementById("msg").textContent=s.dollarWorldStarted && s.dollarRebirths>0
+      ? "💵 Welcome back to Dollar World! Your Dollar World progress was restored!"
+      : "💵 Welcome to Dollar World! Your Dollar rebirths start at 0. Coin World progress is saved!";
+  }else{
+    // RETURN TO COIN WORLD: preserve all Dollar World progress and restore Coin World state.
+    s.dollarRebirths=s.rebirths;
+    s.dollarRebirthMultiplier=s.rebirthMultiplier||1;
+    s.coinRebirths=Math.max(0,s.coinRebirths);
+    s.rebirths=s.coinRebirths;
+    s.rebirthMultiplier=s.coinRebirthMultiplier||1;
+    s.world=1;
+    rebuildCosts();
+    document.getElementById("msg").textContent="🪙 Welcome back to Coin World! Your Coin World progress is restored.";
+  }
+  saveGame();
+  render();
+}
+
+document.getElementById("worldBtn").onclick=switchWorld;
+
+function doRebirth(){
+  const inDollarWorld = worldIs2();
+  const cost=getRebirthCost();
+  if(worldCurrency()<cost)return bad(document.getElementById("rebirthBtn"),"Not enough "+(inDollarWorld?"dollars":"coins")+" to rebirth!");
+  const nextRebirth=s.rebirths+1;
+  const confirmed=confirm(`Are you sure you want to rebirth?\n\nThis will COMPLETELY RESTART ${inDollarWorld?"DOLLAR WORLD":"COIN WORLD"}.\n\nYou will keep your pets, gems, crystals, stars, clicks, and rebirths.\n\nRebirth ${nextRebirth} resets the current world and multiplier to ×1.`);
+  if(!confirmed)return;
+
+  s.rebirths=nextRebirth;
+  if(inDollarWorld){s.dollarRebirths=nextRebirth;s.dollarRebirthMultiplier=1;}
+  else{s.coinRebirths=nextRebirth;s.coinRebirthMultiplier=1;}
+  s.rebirthMultiplier=1;
+  s.xp=0;
+  s.level=1;
+
+  if(inDollarWorld){
+    // Dollar World rebirth: wipe ALL Dollar World progress and stay in Dollar World.
+    s.world2={dollars:0n,power:1n,cps:0n,upgradeCounts:[]};
+    s.world=2;
+  }else{
+    // Coin World rebirth: wipe ALL Coin World progress and stay in Coin World.
+    s.coins=0n;
+    s.power=1n;
+    s.cps=0n;
+    s.gps=0n;
+    s.crystalps=0n;
+    s.starps=0n;
+    s.upgradeCounts=[];
+    s.world=1;
+  }
+
+  rebuildCosts();
+  recalculatePetMultiplier();
+  updateWorldUI();
+  applyCoinColor();
+  applyCoinPosition();
+  document.getElementById("msg").textContent=inDollarWorld
+    ? `♻️ REBIRTH ${s.rebirths}! 💵 Dollar World has RESTARTED! $0 • 0 upgrades • Power 1`
+    : `♻️ REBIRTH ${s.rebirths}! 🪙 Coin World has RESTARTED! 0 coins • 0 upgrades • Power 1`;
+  saveGame();
+  render();
+  playSound("rare");
+  updateAdminUI();
+}
+document.getElementById("rebirthBtn").onclick=doRebirth;
+
+let audioCtx=null,musicOn=false,soundOn=true,musicTimer=null,step=0;
+let weather={name:"Clear",icon:"🌤️",mult:1,rarity:"Common",ends:0},weatherTimer=null;
+function isExtraPowerMonday(){return new Date().getDay()===1}
+function updateMondayBonus(){
+  const box=document.getElementById("mondayBox");
+  if(!box)return;
+  box.style.display="block";
+  box.textContent="⚡ PLAY ON MONDAY FOR 3X CLICKS! ⚡";
+}
+
+const WEATHER=[{name:"Light Rain",icon:"🌧️",mult:2,rarity:"Common",weight:60,color:"💧"},{name:"Golden Rain",icon:"🌟",mult:3,rarity:"Uncommon",weight:25,color:"✨"},{name:"Star Storm",icon:"🌠",mult:5,rarity:"Rare",weight:10,color:"⭐"},{name:"Cosmic Storm",icon:"🌌",mult:10,rarity:"Epic",weight:4,color:"💜"},{name:"Reality Rift",icon:"🌀",mult:25,rarity:"Mythic",weight:1,color:"🌀"}];
+function rollWeather(){const roll=Math.random()*100;let total=0,chosen=WEATHER[0];for(const w of WEATHER){total+=w.weight;if(roll<total){chosen=w;break}}weather={...chosen,ends:Date.now()+30000};updateWeather();spawnWeatherParticles(chosen);document.getElementById("msg").textContent=chosen.icon+" "+chosen.name+"! x"+chosen.mult+" mutation weather!";clearTimeout(weatherTimer);weatherTimer=setTimeout(clearWeather,30000)}
+function clearWeather(){weather={name:"Clear",icon:"🌤️",mult:1,rarity:"Common",ends:0};updateWeather()}
+function updateWeather(){const box=document.getElementById("weatherBox");if(!box)return;if(weather.mult>1){const left=Math.max(0,Math.ceil((weather.ends-Date.now())/1000));box.className="weatherBox weatherRare";box.innerHTML=weather.icon+" <b>"+weather.name+"</b> • "+weather.rarity+" • <b>x"+weather.mult+"</b> click multiplier • "+left+"s"}else{box.className="weatherBox";box.innerHTML="🌤️ <b>Weather: Clear</b> • No mutation active"}}
+function spawnWeatherParticles(w){const count=w.mult>=10?55:w.mult>=5?38:w.mult>=3?28:20;for(let i=0;i<count;i++){setTimeout(()=>{const p=document.createElement("div");p.className="weatherParticle";p.textContent=w.icon;p.style.left=Math.random()*100+"vw";p.style.top=(-5-Math.random()*20)+"vh";p.style.fontSize=(12+Math.random()*15)+"px";p.style.animationDuration=(1.8+Math.random()*2.8)+"s";document.body.appendChild(p);setTimeout(()=>p.remove(),5200)},i*45)}}
+setInterval(updateWeather,1000);setInterval(updateMondayBonus,1000);setInterval(()=>{if(weather.mult===1)rollWeather()},45000);
+
+function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume();return audioCtx}
+function playSound(type){
+  if(!soundOn)return;
+  try{
+    const ctx=getAudio();
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.connect(gain);gain.connect(ctx.destination);
+    if(type==="click"){
+      osc.type="sine";
+      osc.frequency.setValueAtTime(520,ctx.currentTime);
+      gain.gain.setValueAtTime(0.08,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.06);
+      osc.start();osc.stop(ctx.currentTime+0.06);
+    }else if(type==="buy"){
+      osc.type="triangle";
+      osc.frequency.setValueAtTime(600,ctx.currentTime);
+      osc.frequency.setValueAtTime(800,ctx.currentTime+0.07);
+      gain.gain.setValueAtTime(0.1,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.14);
+      osc.start();osc.stop(ctx.currentTime+0.14);
+    }else if(type==="rare"){
+      osc.type="sine";
+      osc.frequency.setValueAtTime(700,ctx.currentTime);
+      osc.frequency.setValueAtTime(1000,ctx.currentTime+0.12);
+      osc.frequency.setValueAtTime(1300,ctx.currentTime+0.24);
+      gain.gain.setValueAtTime(0.12,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.28);
+      osc.start();osc.stop(ctx.currentTime+0.28);
+    }
+  }catch(e){}
+}
+
+document.getElementById("soundBtn").onclick=()=>{
+  soundOn=!soundOn;
+  document.getElementById("soundBtn").textContent="🔊 Sounds: "+(soundOn?"ON":"OFF");
+};
+
+const LOFI_CHORDS=[[130.81,164.81,196.00],[146.83,174.61,220.00],[164.81,196.00,246.94],[123.47,155.56,185.00]];
+let lofiStep=0;
+document.getElementById("musicBtn").onclick=()=>{
+  musicOn=!musicOn;
+  document.getElementById("musicBtn").textContent="🎵 Lofi Hip Hop: "+(musicOn?"ON":"OFF");
+  if(musicOn){
+    clearInterval(musicTimer);
+    musicTimer=setInterval(()=>{
+      if(!musicOn)return;
+      try{
+        const ctx=getAudio();
+        const chord=LOFI_CHORDS[lofiStep%LOFI_CHORDS.length];
+        const root=chord[0];
+        chord.forEach((freq,j)=>{
+          const osc=ctx.createOscillator(),gain=ctx.createGain();
+          osc.type=j===0?"triangle":"sine";osc.frequency.value=freq;
+          gain.gain.setValueAtTime(j===0?0.045:0.025,ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.9);
+          osc.connect(gain);gain.connect(ctx.destination);osc.start();osc.stop(ctx.currentTime+0.9);
+        });
+        // Soft lofi bass hit
+        const bass=ctx.createOscillator(),bg=ctx.createGain();bass.type="sine";bass.frequency.value=root/2;bg.gain.setValueAtTime(0.055,ctx.currentTime);bg.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.45);bass.connect(bg);bg.connect(ctx.destination);bass.start();bass.stop(ctx.currentTime+0.45);
+        lofiStep++;
+      }catch(e){}
+    },900);
+  }else clearInterval(musicTimer);
+};
+
+
+
+
+// ==================== PRIVATE OWNER PANEL ====================
+const OWNER_CODE="JAX-OWNER-8472";
+let ownerUnlocked=false;
+
+function ownerStatus(t,good=true){
+  const el=document.getElementById("ownerStatus");
+  if(el){el.textContent=t;el.style.color=good?"#86efac":"#fca5a5";}
+}
+function ownerOpen(){
+  if(!ownerUnlocked){
+    const code=prompt("🔐 Enter the private Owner Panel code:");
+    if(code!==OWNER_CODE){
+      ownerStatus("❌ Wrong owner code.",false);
+      return;
+    }
+    ownerUnlocked=true;
+  }
+  document.getElementById("ownerOverlay").style.display="flex";
+  ownerStatus("👑 Owner controls unlocked for this session.");
+}
+function ownerLock(){
+  ownerUnlocked=false;
+  document.getElementById("ownerOverlay").style.display="none";
+}
+document.addEventListener("keydown",e=>{
+  if((e.ctrlKey&&e.shiftKey&&e.code==="KeyO")||(e.ctrlKey&&e.shiftKey&&e.metaKey&&e.code==="KeyO")){
+    if(e.repeat)return;
+    e.preventDefault();
+    ownerOpen();
+  }
+});
+
+function ownerBigInput(id,fallback="0"){
+  const raw=(document.getElementById(id)?.value||fallback).trim();
+  if(!/^\d+$/.test(raw))throw new Error("Enter a whole number.");
+  return BigInt(raw);
+}
+function ownerGive(type){
+  if(!ownerUnlocked)return;
+  try{
+    const amount=ownerBigInput("ownerAmount","1000000");
+    if(type==="coins")setWorldCurrency(worldCurrency()+amount);
+    else s[type]+=amount;
+    saveGame();render();ownerStatus("✅ Added "+f(amount)+" "+type+".");
+  }catch(e){ownerStatus("❌ "+e.message,false);}
+}
+function ownerSet(type){
+  if(!ownerUnlocked)return;
+  try{
+    if(type==="power"){setWorldPower(ownerBigInput("ownerPower","1"));ownerStatus("⚡ Power set!");}
+    if(type==="level"){s.level=Math.max(1,Number(document.getElementById("ownerLevel").value)||1);s.xp=0;ownerStatus("📈 Level set!");}
+    if(type==="rebirths"){const n=Math.max(0,Number(document.getElementById("ownerRebirths").value)||0);s.rebirths=n;if(worldIs2()){s.dollarRebirths=n;s.dollarRebirthMultiplier=s.rebirthMultiplier||1;}else{s.coinRebirths=n;s.coinRebirthMultiplier=s.rebirthMultiplier||1;s.adminUnlocked=s.coinRebirths>=250;}ownerStatus("♻️ Active-world rebirths set!");}
+    if(type==="multiplier"){s.rebirthMultiplier=Math.max(1,Number(document.getElementById("ownerMultiplier").value)||1);ownerStatus("✨ Multiplier set!");}
+    rebuildCosts();saveGame();render();
+  }catch(e){ownerStatus("❌ "+e.message,false);}
+}
+function ownerAllUpgrades(){
+  if(!ownerUnlocked)return;
+  U.forEach((u,i)=>{
+    const count=100,counts=worldCounts();
+    counts[i]=(counts[i]||0)+count;
+    if(u[3]==="mul")for(let n=0;n<count;n++)setWorldPower(worldPower()*BigInt(u[4]));
+    else if(u[3]==="power")setWorldPower(worldPower()+BigInt(u[4])*BigInt(count));
+    else if(u[3]==="cps")setWorldCps(worldCps()+BigInt(u[4])*BigInt(count));
+    else if(BIG_KEYS.includes(u[3]))s[u[3]]+=BigInt(u[4])*BigInt(count);
+  });
+  rebuildCosts();saveGame();render();ownerStatus("🎁 All upgrades given!");
+}
+function ownerAllPets(){
+  if(!ownerUnlocked)return;
+  if(worldIs2()){s.dollarOwnedPets=[...Array(DOLLAR_PETS.length).keys()];recalculateDollarPetMultiplier();}else{s.ownedPets=[...Array(P.length).keys()];recalculatePetMultiplier();}
+  saveGame();render();ownerStatus("🐾 All pets unlocked!");
+}
+function ownerMaxEverything(){
+  if(!ownerUnlocked)return;
+  const huge=10n**60n;
+  setWorldCurrency(huge);setWorldPower(huge);setWorldCps(huge);
+  s.gems=huge;s.crystals=huge;s.stars=huge;
+  s.level=1000;s.xp=0;s.rebirths=250;if(worldIs2()){s.dollarRebirths=250;s.dollarRebirthMultiplier=1000000;}else{s.coinRebirths=250;s.coinRebirthMultiplier=1000000;}s.rebirthMultiplier=1000000;
+  s.adminUnlocked=true;s.ownedPets=[...Array(P.length).keys()];s.dollarOwnedPets=[...Array(DOLLAR_PETS.length).keys()];
+  recalculatePetMultiplier();recalculateDollarPetMultiplier();rebuildCosts();saveGame();render();
+  ownerStatus("🔥 EVERYTHING MAXED!");
+}
+function ownerToggleAuto(){
+  if(!ownerUnlocked)return;
+  s.autoClicker=!s.autoClicker;
+  saveGame();render();ownerStatus("🤖 Auto Clicker "+(s.autoClicker?"ON":"OFF")+"!");
+}
+function ownerSave(){
+  if(!ownerUnlocked)return;
+  saveGame();ownerStatus("💾 Game saved!");
+}
+function ownerExplode(){
+  if(!ownerUnlocked)return;
+  adminExplode();ownerStatus("💥 Coin exploded!");
+}
+function ownerMove(){
+  if(!ownerUnlocked)return;
+  adminMoveCoin();render();ownerStatus("🌀 Coin moved!");
+}
+function ownerWorld(which){
+  if(!ownerUnlocked)return;
+  if(which===2){
+    s.coinRebirthMultiplier=s.rebirthMultiplier||s.coinRebirthMultiplier||1;
+    s.dollarRebirths=Number.isInteger(s.dollarRebirths)?s.dollarRebirths:0;
+    s.dollarRebirthMultiplier=Number.isFinite(Number(s.dollarRebirthMultiplier))?Number(s.dollarRebirthMultiplier):1;
+    if(!s.dollarWorldStarted){
+      s.dollarRebirths=0;s.dollarRebirthMultiplier=1;
+      s.world2={dollars:0n,power:1n,cps:0n,upgradeCounts:[]};
+      s.dollarWorldStarted=true;
+    }
+    s.rebirths=s.dollarRebirths;
+    s.rebirthMultiplier=s.dollarRebirthMultiplier;
+    s.xp=0;s.level=1;s.world=2;s.autoClicker=false;secondAdminClose();
+  }else{
+    s.dollarRebirths=s.rebirths;
+    s.dollarRebirthMultiplier=s.rebirthMultiplier||1;
+    s.rebirths=s.coinRebirths;
+    s.rebirthMultiplier=s.coinRebirthMultiplier||1;
+    s.world=1;
+  }
+  rebuildCosts();saveGame();render();
+  ownerStatus(which===2?"💵 Dollar World selected. Existing Dollar World progress restored. Regular Admin and Second Admin are disabled here.":"🪙 Coin World selected. Coin World progress restored; Admins available again.");
+}
+
+function ownerSetWeather(){
+  if(!ownerUnlocked)return;
+  const val=document.getElementById("ownerWeather").value;
+  if(val==="clear"){clearWeather();ownerStatus("🌤️ Weather cleared.");return;}
+  const w=WEATHER.find(x=>String(x.mult)===val);
+  if(!w)return;
+  weather={...w,ends:Date.now()+30000};updateWeather();spawnWeatherParticles(w);
+  clearTimeout(weatherTimer);weatherTimer=setTimeout(clearWeather,30000);
+  ownerStatus("🌌 Weather set to "+w.name+" x"+w.mult+"!");
+}
+
+
+// Regular Admin is intentionally unavailable in Dollar World.
+function updateAdminUI(){
+  const btn=document.getElementById("adminBtn");
+  if(!btn)return;
+  if(worldIs2()){
+    btn.style.display="none";
+    closeAdminNote();
+    return;
+  }
+  btn.style.display="block";
+  if(s.adminUnlocked||s.coinRebirths>=250){
+    s.adminUnlocked=true;
+    btn.classList.add("unlocked");
+    btn.textContent="👑 ADMIN ✓";
+  }else{
+    btn.classList.remove("unlocked");
+    btn.textContent="👑 ADMIN";
+  }
+}
+
+function openAdminNote(){
+  if(worldIs2())return;
+  const note=document.getElementById("adminNote"),text=document.getElementById("adminNoteText"),panel=document.getElementById("adminPanel"),lockedClose=document.getElementById("adminLockedClose");
+  if(s.adminUnlocked||s.coinRebirths>=250){
+    s.adminUnlocked=true;
+    text.innerHTML='<span class="adminUnlocked">🎉 Admin unlocked!</span>';
+    panel.style.display="block";lockedClose.style.display="none";renderHall();updateAutoButton();
+  }else{
+    text.textContent="🔒 You need 250 rebirths to unlock Admin!";
+    panel.style.display="none";lockedClose.style.display="block";
+  }
+  note.classList.add("show");saveGame();
+}
+
+function adminGuard(){
+  if(worldIs2()){closeAdminNote();return false;}
+  return true;
+}
+const _adminX100Clicks=adminX100Clicks;
+const _adminMillionPower=adminMillionPower;
+const _adminExplode=adminExplode;
+const _adminMoveCoin=adminMoveCoin;
+const _adminAddHall=adminAddHall;
+const _adminToggleAuto=adminToggleAuto;
+const _adminAllUpgrades=adminAllUpgrades;
+const _adminBillionCoins=adminBillionCoins;
+adminX100Clicks=function(){if(adminGuard())_adminX100Clicks()};
+adminMillionPower=function(){if(adminGuard())_adminMillionPower()};
+adminExplode=function(){if(adminGuard())_adminExplode()};
+adminMoveCoin=function(){if(adminGuard())_adminMoveCoin()};
+adminAddHall=function(){if(adminGuard())_adminAddHall()};
+adminToggleAuto=function(){if(adminGuard())_adminToggleAuto()};
+adminAllUpgrades=function(){if(adminGuard())_adminAllUpgrades()};
+adminBillionCoins=function(){if(adminGuard())_adminBillionCoins()};
+
+
+// ==================== SECOND PERSON ADMIN ====================
+const SECOND_ADMIN_PASSWORD="SECOND OWNER24";
+let secondAdminOpen=false;
+
+function secondAdminStatus(t,good=true){
+  const el=document.getElementById("secondAdminStatus");
+  if(el){el.textContent=t;el.style.color=good?"#93c5fd":"#fca5a5";}
+}
+function secondAdminOpenPanel(){
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);return;}
+  if(!secondAdminOpen){
+    const password=prompt("🔐 Enter Second Admin password:");
+    if(password!==SECOND_ADMIN_PASSWORD){
+      secondAdminStatus("❌ Wrong Second Admin password.",false);
+      return;
+    }
+    secondAdminOpen=true;
+  }
+  document.getElementById("secondAdminOverlay").style.display="flex";
+  secondAdminStatus("🛡️ Second Admin unlocked for this session.");
+}
+function secondAdminClose(){
+  secondAdminOpen=false;
+  document.getElementById("secondAdminOverlay").style.display="none";
+}
+document.addEventListener("keydown",e=>{
+  // ChromeOS Search is exposed as Meta in Chrome.
+  if(e.ctrlKey&&e.shiftKey&&e.metaKey&&e.code==="KeyS"){
+    if(worldIs2())return;
+    e.preventDefault();
+    secondAdminOpenPanel();
+  }
+});
+
+function secondAdminGiveCoins(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  setWorldCurrency(worldCurrency()+25000n);
+  saveGame();render();
+  secondAdminStatus("🪙 Added 25,000 "+(worldIs2()?"dollars":"coins")+".");
+}
+function secondAdminGiveGems(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  s.gems+=10n;
+  saveGame();render();
+  secondAdminStatus("💎 Added 10 gems.");
+}
+function secondAdminGiveCrystal(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  s.crystals+=2n;
+  saveGame();render();
+  secondAdminStatus("🔮 Added 2 crystals.");
+}
+function secondAdminGiveStar(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  s.stars+=1n;
+  saveGame();render();
+  secondAdminStatus("🌌 Added 1 star.");
+}
+function secondAdminClicks(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  for(let i=0;i<250;i++){
+    const [k,m]=rare();
+    const petScaled=BigInt(Math.round(activePetMultiplier()*100));
+    const weatherMult=BigInt(weather.mult);
+    const rebirthMultiplier=getRebirthMultiplierNum();
+    let mondayMultiplier=isExtraPowerMonday()?3n:1n;
+    let g=(worldPower()*BigInt(m)*petScaled*weatherMult*rebirthMultiplier*mondayMultiplier)/10000n;
+    if(worldIs2())g=g*35n/100n;
+    if(g<1n)g=1n;
+    setWorldCurrency(worldCurrency()+g);
+    s.clicks++;s[k]++;
+  }
+  saveGame();render();
+  secondAdminStatus("🖱️ Added 250 clicks.");
+}
+function secondAdminPower(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  let p=worldPower();
+  if(worldIs2())p=p+p/2n+1n;
+  else p*=2n;
+  setWorldPower(p);
+  saveGame();render();
+  secondAdminStatus("⚡ Power boosted (limited).");
+}
+function secondAdminSetWeather(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  const val=document.getElementById("secondAdminWeather").value;
+  if(val==="clear"){
+    clearWeather();
+    secondAdminStatus("🌤️ Weather cleared.");
+    return;
+  }
+  const w=WEATHER.find(x=>String(x.mult)===val);
+  if(!w)return;
+  weather={...w,ends:Date.now()+30000};
+  updateWeather();spawnWeatherParticles(w);
+  clearTimeout(weatherTimer);
+  weatherTimer=setTimeout(clearWeather,30000);
+  secondAdminStatus("🌦️ Set "+w.name+" x"+w.mult+" for 30 seconds.");
+}
+function secondAdminMove(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  s.coinOffsetX=Math.round((Math.random()-.5)*300);
+  s.coinOffsetY=Math.round((Math.random()-.5)*180);
+  saveGame();render();
+  secondAdminStatus("🌀 Coin moved.");
+}
+function secondAdminExplode(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  const c=document.getElementById("coin");
+  if(c)c.animate(
+    [{transform:"scale(1)"},{transform:"scale(1.35) rotate(8deg)"},{transform:"scale(.8) rotate(-8deg)"},{transform:"scale(1)"}],
+    {duration:500,easing:"ease-out"}
+  );
+  secondAdminStatus("💥 Coin effect!");
+}
+function secondAdminSave(){
+  if(worldIs2()){secondAdminClose();return;}
+  if(worldIs2()){secondAdminStatus("🚫 Second Admin is disabled in Dollar World.",false);secondAdminClose();return;}
+  saveGame();
+  secondAdminStatus("💾 Game saved.");
+}
+
+// Repair older saves that stored BigInt fields as strings.
+function normalizeBigIntState(){
+  BIG_KEYS.forEach(k=>{if(typeof s[k]!=="bigint"){try{s[k]=BigInt(s[k]??0)}catch(e){s[k]=0n}}});
+  if(!s.world2||typeof s.world2!=="object")s.world2={dollars:0n,power:1n,cps:0n,upgradeCounts:[]};
+  ["dollars","power","cps"].forEach(k=>{if(typeof s.world2[k]!=="bigint"){try{s.world2[k]=BigInt(s.world2[k]??(k==="power"?1:0))}catch(e){s.world2[k]=k==="power"?1n:0n}}});
+  if(!Array.isArray(s.upgradeCounts))s.upgradeCounts=[];
+  if(!Array.isArray(s.world2.upgradeCounts))s.world2.upgradeCounts=[];
+}
+normalizeBigIntState();
+rebuildCosts();
+rebuildCosts();
+render();
+updateSpaceTacoTimer();
+</script>
+</body>
+</html>
