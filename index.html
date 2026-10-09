@@ -2021,20 +2021,10 @@ function updateWorldUI(){
  else{notice.innerHTML="🌎 <b>Coin World</b> • Reach <b>100 Coin World rebirths</b> to unlock Dollar World!";icon.textContent="🪙";label.textContent=" coins";coin.textContent="🪙";title.textContent="🪙 COIN CLICKER";powerLabel.textContent="Power";}
  if(s.coinOffsetX!==0||s.coinOffsetY!==0){s.coinOffsetX=0;s.coinOffsetY=0;}applyCoinPosition();}
 
-function saveCurrentWorldProgress(worldOverride){
- const activeWorld=Number(worldOverride)||Number(s.world)||1;
- if(activeWorld===5){s.world5.level=s.level;s.world5.xp=s.xp;s.natureRebirths=Math.max(0,Number(s.rebirths)||0);s.natureRebirthMultiplier=s.rebirthMultiplier||1;s.natureWorldStarted=true;}
- else if(activeWorld===4){s.world4.level=s.level;s.world4.xp=s.xp;s.crystalRebirths=Math.max(0,Number(s.rebirths)||0);s.crystalRebirthMultiplier=s.rebirthMultiplier||1;s.crystalWorldStarted=true;}
- else if(activeWorld===3){s.world3.level=s.level;s.world3.xp=s.xp;s.goldRebirths=Math.max(0,Number(s.rebirths)||0);s.goldRebirthMultiplier=s.rebirthMultiplier||1;s.goldWorldStarted=true;}
- else if(activeWorld===2){s.world2.level=s.level;s.world2.xp=s.xp;s.dollarRebirths=Math.max(0,Number(s.rebirths)||0);s.dollarRebirthMultiplier=s.rebirthMultiplier||1;s.dollarWorldStarted=true;}
- else{s.coinRebirths=Math.max(0,Number(s.rebirths)||0);s.coinRebirthMultiplier=s.rebirthMultiplier||1;s.coinLevel=Math.max(1,Number(s.level)||1);s.coinXp=Math.max(0,Number(s.xp)||0);s.coinDoubleTapMult=Math.max(1,Number(s.doubleTapMult)||1);}
-}
+function saveCurrentWorldProgress(){if(worldIs5()){s.world5.level=s.level;s.world5.xp=s.xp;s.natureRebirths=s.rebirths;s.natureRebirthMultiplier=s.rebirthMultiplier||1;s.natureWorldStarted=true;}else if(worldIs4()){s.world4.level=s.level;s.world4.xp=s.xp;s.crystalRebirths=s.rebirths;s.crystalRebirthMultiplier=s.rebirthMultiplier||1;s.crystalWorldStarted=true;}else if(worldIs3()){s.world3.level=s.level;s.world3.xp=s.xp;s.goldRebirths=s.rebirths;s.goldRebirthMultiplier=s.rebirthMultiplier||1;s.goldWorldStarted=true;}else if(worldIs2()){s.world2.level=s.level;s.world2.xp=s.xp;s.dollarRebirths=s.rebirths;s.dollarRebirthMultiplier=s.rebirthMultiplier||1;s.dollarWorldStarted=true;}else{s.coinRebirths=Math.max(0,s.rebirths);s.coinRebirthMultiplier=s.rebirthMultiplier||1;s.coinLevel=Math.max(1,Number(s.level)||1);s.coinXp=Math.max(0,Number(s.xp)||0);s.coinDoubleTapMult=Math.max(1,Number(s.doubleTapMult)||1);}}
 
 function switchWorld(target){
   target=Number(target);
-  const outgoingWorld=Number(s.world)||1;
-  // Save the world being left before changing any active-world state.
-  saveCurrentWorldProgress(outgoingWorld);
   lockWorldSwitch(target);
   const previewUnlocks=!IS_GITHUB;
   const dollarUnlocked=previewUnlocks||s.coinRebirths>=100,goldUnlocked=previewUnlocks||s.dollarRebirths>=60||(worldIs2()&&s.rebirths>=60),crystalUnlocked=previewUnlocks||s.goldRebirths>=125||(worldIs3()&&s.rebirths>=125),natureUnlocked=previewUnlocks||s.crystalRebirths>=100||(worldIs4()&&s.rebirths>=100);
@@ -2042,7 +2032,11 @@ function switchWorld(target){
   if(target===3&&!goldUnlocked){document.getElementById("msg").textContent="❌ Reach 60 Dollar World rebirths to unlock Gold World!";updateWorldUI();return;}
   if(target===4&&!crystalUnlocked){document.getElementById("msg").textContent="❌ Reach 125 Gold World rebirths to unlock Crystal World!";updateWorldUI();return;}
   if(target===5&&!natureUnlocked){document.getElementById("msg").textContent="❌ Reach 100 Crystal World rebirths to unlock Nature World!";updateWorldUI();return;}
-
+  if(worldIs2())s.dollarRebirths=Math.max(Number(s.dollarRebirths)||0,Number(s.rebirths)||0);
+  if(worldIs3())s.goldRebirths=Math.max(Number(s.goldRebirths)||0,Number(s.rebirths)||0);
+  if(worldIs4())s.crystalRebirths=Math.max(Number(s.crystalRebirths)||0,Number(s.rebirths)||0);
+  if(worldIs5())s.natureRebirths=Math.max(Number(s.natureRebirths)||0,Number(s.rebirths)||0);
+  saveCurrentWorldProgress();
   if(target===2 && !s.world2){s.world2={dollars:0n,power:1n,cps:0n,upgradeCounts:[],level:1,xp:0,doubleTapMult:1};}
   if(target===3 && !s.world3){s.world3={gold:0n,power:1n,cps:0n,upgradeCounts:[],level:1,xp:0,doubleTapMult:1};}
   if(target===4 && !s.world4){s.world4={crystals:0n,power:1n,cps:0n,upgradeCounts:[],level:1,xp:0,doubleTapMult:1};}
@@ -2361,9 +2355,8 @@ function updateOwnerWeatherOptions(){
 
 function ownerWorld(which){
   if(!ownerUnlocked)return;
-  const outgoingWorld=Number(s.world)||1;
-  saveCurrentWorldProgress(outgoingWorld);
   if(which===1){
+    saveCurrentWorldProgress();
     s.rebirths=s.coinRebirths;
     s.rebirthMultiplier=s.coinRebirthMultiplier||1;
     s.world=1;
@@ -2373,6 +2366,7 @@ function ownerWorld(which){
       s.world2={dollars:0n,power:1n,cps:0n,upgradeCounts:[],level:1,xp:0,doubleTapMult:1};
       s.dollarWorldStarted=true;
     }
+    saveCurrentWorldProgress();
     s.rebirths=s.dollarRebirths;
     s.rebirthMultiplier=s.dollarRebirthMultiplier||1;
     s.world=2;s.xp=s.world2.xp;s.level=s.world2.level;s.autoClicker=false;
@@ -2383,6 +2377,7 @@ function ownerWorld(which){
       s.world3={gold:0n,power:1n,cps:0n,upgradeCounts:[],level:1,xp:0,doubleTapMult:1};
       s.goldWorldStarted=true;
     }
+    saveCurrentWorldProgress();
     s.rebirths=s.goldRebirths;
     s.rebirthMultiplier=s.goldRebirthMultiplier||1;
     s.world=3;s.xp=s.world3.xp;s.level=s.world3.level;s.autoClicker=false;
@@ -2393,6 +2388,7 @@ function ownerWorld(which){
       s.world4={crystals:0n,power:1n,cps:0n,upgradeCounts:[],level:1,xp:0,doubleTapMult:1};
       s.crystalWorldStarted=true;
     }
+    saveCurrentWorldProgress();
     s.rebirths=s.crystalRebirths;
     s.rebirthMultiplier=s.crystalRebirthMultiplier||1;
     s.world=4;s.xp=s.world4.xp;s.level=s.world4.level;s.autoClicker=false;
@@ -2400,6 +2396,7 @@ function ownerWorld(which){
   }
   else if(which===5){
     if(!s.natureWorldStarted){s.natureRebirths=0;s.natureRebirthMultiplier=1;s.world5={wood:0n,power:1n,cps:0n,upgradeCounts:[],level:1,xp:0,doubleTapMult:1};s.natureWorldStarted=true;}
+    saveCurrentWorldProgress();
     s.rebirths=s.natureRebirths;s.rebirthMultiplier=s.natureRebirthMultiplier||1;s.world=5;s.xp=s.world5.xp;s.level=s.world5.level;s.autoClicker=false;
     secondAdminClose();
   }
